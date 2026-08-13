@@ -1,0 +1,90 @@
+{
+  "version": 2,
+  "_note": "Transport stacking matrix. maxStackPressureKpa is the internal vertical-crush limit on the item's top face: the box above is refused when (weight x g / contact area) exceeds it (horizontal forces and an item's own self-weight are out of scope for this model). canSupportWeightKg is a HARD ceiling on the total mass that may rest on the item's top face (candidate + everything already stacked on it), enforced alongside the pressure limit in placement-validator.ts. densityKgPerM3 is the weight-estimator fallback when the PDF carries no per-item weight; values lean conservative (over-estimate) so payload limits are never breached. orientationLock is the category-level default rotation policy (fixed|partial|none) — overridden per item once Material is classified (config/durability-rules.json, durability-tiers.json). 'pallet' is a separate ruleset (not a category) for a manifest's declared pallet lines: a pallet's stackability is a PACKAGING fact (a flat, structurally stackable transport unit), independent of what its description's matched category says about its contents — used in place of a category whenever that category would hard-veto stacking (canSupportWeightKg 0), e.g. a 'Pallet of Wine Glasses' description matching glass-panel.",
+  "fallback": {
+    "stackable": false,
+    "canSupportWeightKg": 0,
+    "densityKgPerM3": 700,
+    "orientationLock": "fixed",
+    "maxStackPressureKpa": 8
+  },
+  "pallet": {
+    "stackable": true,
+    "canSupportWeightKg": 500,
+    "densityKgPerM3": 700,
+    "orientationLock": "fixed",
+    "maxStackPressureKpa": 150
+  },
+  "categories": {
+    "heavy-material": {
+      "stackable": true,
+      "canSupportWeightKg": 2000,
+      "densityKgPerM3": 5000,
+      "orientationLock": "none",
+      "maxStackPressureKpa": 300
+    },
+    "glass-panel": {
+      "stackable": false,
+      "canSupportWeightKg": 0,
+      "densityKgPerM3": 2500,
+      "orientationLock": "none",
+      "maxStackPressureKpa": 5
+    },
+    "column": {
+      "stackable": false,
+      "canSupportWeightKg": 0,
+      "densityKgPerM3": 400,
+      "orientationLock": "fixed",
+      "maxStackPressureKpa": 10
+    },
+    "light-industrial": {
+      "stackable": true,
+      "canSupportWeightKg": 500,
+      "densityKgPerM3": 1400,
+      "orientationLock": "none",
+      "maxStackPressureKpa": 150
+    },
+    "appliance": {
+      "stackable": false,
+      "canSupportWeightKg": 0,
+      "densityKgPerM3": 250,
+      "orientationLock": "fixed",
+      "maxStackPressureKpa": 12
+    },
+    "top": {
+      "stackable": false,
+      "canSupportWeightKg": 0,
+      "densityKgPerM3": 700,
+      "orientationLock": "fixed",
+      "maxStackPressureKpa": 20
+    },
+    "base-cabinet": {
+      "stackable": true,
+      "canSupportWeightKg": 80,
+      "densityKgPerM3": 180,
+      "orientationLock": "none",
+      "maxStackPressureKpa": 40
+    },
+    "wall-cabinet": {
+      "stackable": true,
+      "canSupportWeightKg": 30,
+      "densityKgPerM3": 120,
+      "orientationLock": "none",
+      "maxStackPressureKpa": 25
+    },
+    "tall-unit": {
+      "stackable": false,
+      "canSupportWeightKg": 0,
+      "densityKgPerM3": 160,
+      "orientationLock": "fixed",
+      "maxStackPressureKpa": 15
+    },
+    "accessory": {
+      "stackable": true,
+      "canSupportWeightKg": 20,
+      "densityKgPerM3": 300,
+      "orientationLock": "none",
+      "maxStackPressureKpa": 15
+    }
+  }
+}

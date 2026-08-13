@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "_note": "Seed mapping durabilityTier -> maxStackPressureKpa. Combined with the category default in item-assembler.ts via Math.min (most conservative wins). Placeholder values sized to match the existing spread in stackability.json (5-300 kPa) -- these are a starting point for tuning against real fleet data, not physics-verified constants.",
+  "tiers": {
+    "none": 0,
+    "low": 20,
+    "medium": 60,
+    "high": 300
+  },
+  "_deformableNote": "Multiplier (0<f<=1) applied to a deformable item's crush limit -- foam/fabric compresses, so it bears less on top than a rigid item of the same tier. Tighten-only: it can only lower a limit, never raise one. 1 = no softening.",
+  "deformableFactor": 0.7,
+  "_brittleNote": "Multiplier (0<f<=1) applied to a brittle item's crush limit -- glass/ceramic/stone cracks rather than crushing gradually, so it bears less on top than a rigid item of the same tier. Applied on top of a tier cap (brittle items are also capped at 'low' before this factor, so an unrecognised brittle material that falls back to 'medium' can't out-rank a properly classified low-tier item). Tighten-only, same convention as deformableFactor. Kept the same value as deformableFactor for consistency.",
+  "brittleFactor": 0.7,
+  "_unclassifiedTierNote": "Displayed/tracked durabilityTier for a row with no Material text, or whose Material the classifier didn't recognise -- informational only, shown to the operator so they know the figure is a placeholder. Crush safety never depends on this: maxStackPressureKpa stays at the category default in that case (see item-assembler.ts), it is not derived from this placeholder tier. Change it if the fleet's typical unclassified cargo skews toward a different risk band; it has no effect on stacking limits either way.",
+  "unclassifiedTier": "medium"
+}

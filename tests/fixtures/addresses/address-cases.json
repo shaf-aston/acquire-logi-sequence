@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "standard-collection-delivery-pair-with-descriptor-word",
+      "input": { "markdown": "Collection Address: 5 Main Road, Leeds, LS1 4AB\nDelivery Address: 22 Oak Street, Bristol, BS1 5TR" },
+      "expect": { "pickup": "Address: 5 Main Road, Leeds, LS1 4AB", "drops": ["Address: 22 Oak Street, Bristol, BS1 5TR"] }
+    },
+    {
+      "name": "bare-from-to-labels-no-longer-match-prose-fix",
+      "input": { "markdown": "From: 5 Main Road, Leeds LS1 4AB\nTo: 22 Oak Street, Bristol BS1 5TR" },
+      "expect": { "pickup": null, "drops": [] }
+    },
+    {
+      "name": "postcode-shapes-A99-9AA-and-AA9-9AA",
+      "input": { "markdown": "Collection: 5 Main Road, B33 8TH\nDelivery: 22 Oak Street, CR2 6XH" },
+      "expect": { "pickup": "5 Main Road, B33 8TH", "drops": ["22 Oak Street, CR2 6XH"] }
+    },
+    {
+      "name": "postcode-shapes-AA99-9AA-and-A9A-9AA",
+      "input": { "markdown": "Collection: 5 Main Road, DN55 1PT\nDelivery: 22 Oak Street, W1A 0AX" },
+      "expect": { "pickup": "5 Main Road, DN55 1PT", "drops": ["22 Oak Street, W1A 0AX"] }
+    },
+    {
+      "name": "postcode-shapes-AA9A-9AA-and-A9-9AA",
+      "input": { "markdown": "Collection: 5 Main Road, EC1A 1BB\nDelivery: 22 Oak Street, M1 1AE" },
+      "expect": { "pickup": "5 Main Road, EC1A 1BB", "drops": ["22 Oak Street, M1 1AE"] }
+    },
+    {
+      "name": "multi-drop-three-deliveries-in-one-document",
+      "input": { "markdown": "Collection: 1 Start Lane, SW1A 1AA\nDelivery: 10 First Ave, M1 2AB\nDelivery: 20 Second Ave, E1 6AN\nDelivery: 30 Third Ave, B33 8TH" },
+      "expect": { "pickup": "1 Start Lane, SW1A 1AA", "drops": ["10 First Ave, M1 2AB", "20 Second Ave, E1 6AN", "30 Third Ave, B33 8TH"] }
+    },
+    {
+      "name": "negative-unlabeled-postcode-looking-reference-number",
+      "input": { "markdown": "Some notes about the job, ref AB12 3CD maybe." },
+      "expect": { "pickup": null, "drops": [] }
+    },
+    {
+      "name": "BUG-reference-number-inherits-prior-line-label",
+      "input": { "markdown": "Delivery: 10 High St, M1 2AB\nREF: AB12 3CD" },
+      "expect": { "pickup": null, "drops": ["10 High St, M1 2AB", "REF: AB12 3CD"] }
+    },
+    {
+      "name": "negative-phone-number-not-matched-as-postcode",
+      "input": { "markdown": "Collection: 5 Main Road, LS1 4AB\nCall us on 01132 345678 for details." },
+      "expect": { "pickup": "5 Main Road, LS1 4AB", "drops": [] }
+    },
+    {
+      "name": "negative-order-id-not-matched-as-postcode",
+      "input": { "markdown": "Order ID: ORD-2024-8891\nDelivery: 10 High St, M1 2AB" },
+      "expect": { "pickup": null, "drops": ["10 High St, M1 2AB"] }
+    },
+    {
+      "name": "negative-us-zip-code-even-with-drop-label-present",
+      "input": { "markdown": "Collection: 5 Main Road, LS1 4AB\nShip to warehouse, 123 Main St, Springfield, IL 62704" },
+      "expect": { "pickup": "5 Main Road, LS1 4AB", "drops": [] }
+    },
+    {
+      "name": "negative-address-free-document-returns-empty-no-throw",
+      "input": { "markdown": "Please find attached the invoice for services rendered last month." },
+      "expect": { "pickup": null, "drops": [] }
+    },
+    {
+      "name": "postcode-at-line-end-descriptor-word-no-longer-leaks-into-address-fix",
+      "input": { "markdown": "Please deliver to 22 Oak Street, Bristol BS1 5TR" },
+      "expect": { "pickup": null, "drops": ["22 Oak Street, Bristol BS1 5TR"] }
+    },
+    {
+      "name": "postcode-mid-sentence-bare-from-label-no-longer-leaks-prose-fix",
+      "input": { "markdown": "Please note the parcel originates from 5 Main Road, Leeds LS1 4AB for tomorrow's run." },
+      "expect": { "pickup": null, "drops": [] }
+    },
+    {
+      "name": "label-on-one-line-address-on-the-next",
+      "input": { "markdown": "Collection:\n5 Main Road, Leeds LS1 4AB" },
+      "expect": { "pickup": "5 Main Road, Leeds LS1 4AB", "drops": [] }
+    },
+    {
+      "name": "duplicate-exact-address-mentions-deduped-to-one",
+      "input": { "markdown": "Collection: 1 Start Lane, SW1A 1AA\nDelivery: 10 First Ave, M1 2AB\nDelivery: 10 First Ave, M1 2AB\nDelivery: 10 First Ave, M1 2AB" },
+      "expect": { "pickup": "1 Start Lane, SW1A 1AA", "drops": ["10 First Ave, M1 2AB"] }
+    },
+    {
+      "name": "lowercase-and-no-space-postcode-variants-still-detected",
+      "input": { "markdown": "collection: 5 main road, leeds ls14ab\ndelivery: 22 oak street, bristol bs15tr" },
+      "expect": { "pickup": "5 main road, leeds ls14ab", "drops": ["22 oak street, bristol bs15tr"] }
+    },
+    {
+      "name": "generic-to-label-no-longer-false-positives-in-prose-fix",
+      "input": { "markdown": "According to the schedule, please note M1 2AB is the code." },
+      "expect": { "pickup": null, "drops": [] }
+    },
+    {
+      "name": "mixed-pickup-and-drop-labels-on-one-line-each-gets-its-own-address-fix",
+      "input": { "markdown": "Please collect from 5 Main Road, Leeds LS1 4AB and deliver to 10 High Street, Manchester M1 2AB in one trip." },
+      "expect": { "pickup": "5 Main Road, Leeds LS1 4AB and", "drops": ["10 High Street, Manchester M1 2AB in one trip."] }
+    },
+    {
+      "name": "table-route-two-collections-one-delivery-deliver-uses-delivery-row",
+      "input": {
+        "markdown": "",
+        "tables": [
+          {
+            "index": 0,
+            "headers": ["Stop", "Type", "Company / Contact", "Address", "Notes"],
+            "rows": [
+              ["1", "COLLECTION", "Ferro Cast Engineering Ltd Contact: David Okafor +44 121 743 2091", "Unit 2, Sheldon Business Park Birmingham, B26 3QT United Kingdom", "Crane loading on site Booked slot 07:00"],
+              ["2", "COLLECTION", "Midland Precision Castings Ltd Contact: Susan Wray +44 121 706 4420", "Unit 14, Chelmsley Wood Ind. Est. Birmingham, B37 7HD United Kingdom", "Forklift on site"],
+              ["3", "DELIVERY (FINAL)", "Trentworth Power Station Contact: Ian Boothroyd", "Trentworth Energy Site Castle Donington, DE74 2SA United Kingdom", "Escort vehicle required"]
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "pickup": "Unit 2, Sheldon Business Park Birmingham, B26 3QT United Kingdom",
+        "drops": ["Trentworth Energy Site Castle Donington, DE74 2SA United Kingdom"]
+      }
+    },
+    {
+      "name": "table-milkround-collection-header-kind-collect-run-is-the-pickups",
+      "input": {
+        "markdown": "Sequenced collection run into the consolidation centre.",
+        "tables": [
+          {
+            "index": 0,
+            "headers": ["Stop", "Collection Company / Contact", "Collection Address", "Est. Arrival", "Pallets"],
+            "rows": [
+              ["1", "Avonmouth Marine Supplies Ltd Contact: Delia Frost +44 117 982 1140", "Kings Weston Lane Avonmouth, Bristol, BS11 8DG, UK", "07:00", "3"],
+              ["2", "Filton Aerospace Components Contact: Ravi Nair", "Filton Business Park Bristol, BS34 7QS, UK", "07:45", "2"]
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "pickup": "Kings Weston Lane Avonmouth, Bristol, BS11 8DG, UK",
+        "drops": ["Filton Business Park Bristol, BS34 7QS, UK"]
+      }
+    },
+    {
+      "name": "table-groupage-two-stage-collect-ignores-the-delivery-table",
+      "input": {
+        "markdown": "Groupage Consolidation — collections into the hub.",
+        "tables": [
+          {
+            "index": 0,
+            "headers": ["#", "Collection Company / Contact", "Collection Address", "Pallets"],
+            "rows": [
+              ["1", "Salford Textile Mills Ltd", "Regent Trading Estate Salford, M5 4QH, UK", "6"],
+              ["2", "Pennine Hardware Co", "Pennine Industrial Park Rochdale, OL11 1EX, UK", "2"]
+            ]
+          },
+          {
+            "index": 1,
+            "headers": ["#", "Delivery Company / Contact", "Delivery Address", "Pallets"],
+            "rows": [
+              ["1", "Solent Retail Group", "Solent Retail Park Southampton, SO15 1AA, UK", "5"]
+            ]
+          }
+        ]
+      },
+      "expect": {
+        "pickup": "Regent Trading Estate Salford, M5 4QH, UK",
+        "drops": ["Pennine Industrial Park Rochdale, OL11 1EX, UK"]
+      }
+    }
+  ]
+}

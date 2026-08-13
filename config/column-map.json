@@ -1,0 +1,63 @@
+{
+  "version": 3,
+  "_note": "Header-driven column map. Columns are located by matching each table's header row against 'headerPatterns' (first match wins), so ONE config handles differing layouts — e.g. the 6-column cm sheet (| Item # | Item Description | Material | Height (cm) | Width (cm) | Weight (kg) |) and the 11-column metres sheet (| # | Item Description | Category | Material | Height (m) | Width (m) | Depth (m) | Unit Weight (kg) | Quantity | Line Volume | Line Weight |). The fixed 'columns' indices are a fallback for required fields when no header matches and for tables with no usable headers. Length unit is auto-detected per table from the dimension headers ('(cm)' / '(m)'); 'inputUnit' is the fallback. 'decimalSeparator' is '.' (English/US: dot decimal) — integers parse identically, so it is safe for the cm sheet too; set to ',' for Italian/European sources. 'code' points at the description so categoryPatterns match item text. Depth/quantity are optional: when the sheet has no such column they are absent (depth derived from mass÷density, quantity defaults to 1). Fragility is handled separately in Stage 2. 'dimensionCombined' matches a SINGLE column that packs all three extents into one cell ('L x W x D (cm)', 'Pallet Size (cm)') — the assembler splits it into l/w/h and it takes priority over the separate H/W/D columns when present.",
+  "inputUnit": "m",
+  "_unitInferenceNote": "When a size column states NO unit (a bare 'H | W | D'), reading it as 'inputUnit' is a GUESS, and an unmarked cm sheet read as metres is a silent 100x error (a 30x120x100 cm box becomes a 30x120x100 METRE box: unpackable, and its weight multiplied out to nonsense). So instead of assuming, we PROVE the unit from the magnitudes: freight has physical limits, and only one unit puts a sheet's dimensions inside them. Each candidate unit is scored by the fraction of the table's dimension values that land in a plausible freight range once converted; the first candidate to reach 'minConfidence' wins, ties going to the earlier entry (hence 'm' first: a well-formed metre sheet is never re-interpreted). Below 'minConfidence' nothing is proven, so we fall back to 'inputUnit' and the table stays flagged for review. Widen plausibleMaxM if you carry genuinely longer indivisible loads; 'minSamples' guards against inferring from one or two stray numbers.",
+  "unitInference": {
+    "candidates": ["m", "cm", "mm"],
+    "plausibleMinM": 0.05,
+    "plausibleMaxM": 4.0,
+    "minConfidence": 0.8,
+    "minSamples": 3
+  },
+  "_totalsRowNote": "Rows that state a TOTAL rather than carry cargo — 'Sub-total Stop 1', 'GRAND TOTAL', or a bare section marker like 'S1'. They are matched on the description/code cell. Two things depend on getting this right: they must not be loaded as phantom cargo (a subtotal row has a weight but no size, so it would otherwise be quoted as an unplaceable item and DOUBLE the job's weight), and they are the independent check that proves what the weight column means (see _weightTotalNote). Widen this pattern if a source labels its totals differently.",
+  "totalsRowPattern": "\\btotals?\\b|\\bsub-?total\\b|\\bgrand\\b|^\\s*s\\d+\\s*$",
+  "_weightTotalNote": "A weight column may be a PER-UNIT weight or the LINE'S TOTAL, and sheets label neither. Read '48' as per-unit on a line of Qty 200 and you quote 9,600 kg instead of 48 kg. We don't guess: most sheets state their own subtotals, so we add the weights up both ways and see which sum the sheet's own total agrees with. 'weightTotalTolerance' is how close that has to be to count as agreement (0.02 = 2%, allowing for rounding on the sheet). When the sheet states no total, nothing is proven and the per-unit reading stands, with the table flagged for review.",
+  "weightTotalTolerance": 0.02,
+  "_lostTableFloorNote": "When a scan loses a table's header row, its columns cannot be identified, so its rows are NOT packed — and the operator must be told, or cargo vanishes in silence. But the parser calls any block of pipe-prefixed lines a headerless table, and that includes ordinary prose and letterheads ('| Total: 266 pallets | 35,910 kg |'). Reporting those as lost cargo buries the real ones. So a lost table is reported only once it is big enough to plausibly BE a cargo table. Raise this if the warnings are noisy; LOWER it if a real table ever slips through unreported — under-reporting lost cargo is by far the worse failure of the two.",
+  "lostTableFloor": {
+    "minRows": 2,
+    "minColumns": 3
+  },
+  "_minDerivedDepthNote": "Floor (metres) for a depth DERIVED from mass / (density x face area) when a source table carries only two dimensions plus a weight -- avoids fabricating a zero-thickness box. Applies to ANY item with a derived depth (not pallet-specific, hence top-level rather than under palletDefaults). 0.02 m = 20 mm.",
+  "minDerivedDepthM": 0.02,
+  "decimalSeparator": ".",
+  "headerPatterns": {
+    "code": "description",
+    "description": "description",
+    "dimensionH": "height|length|^\\s*[hl]\\b",
+    "dimensionL": "width|^\\s*w\\b",
+    "dimensionP": "depth|^\\s*d\\b",
+    "dimensionCombined": "l\\s*[x×*]\\s*w|pallet\\s*size|dimensions?\\b|\\bdims?\\b|measurements?\\b|\\bsize\\s*\\(",
+    "weight": "weight|\\bwt\\b|\\bmass\\b",
+    "quantity": "quantity|\\bqty\\b|\\bpcs\\b|\\bpieces?\\b",
+    "material": "material",
+    "pallets": "pallet",
+    "stop": "\\bstop\\b|\\bdrop\\b"
+  },
+  "_palletNote": "When a table has a 'Pallets' column, the LOAD UNIT is the pallet, not the descriptive piece/unit count. Each line is quoted as its pallet count of standard-footprint pallets — never exploded into individual pieces. 'palletDefaults' supplies the standard pallet footprint (metres) and a default loaded height for lines that give no per-pallet Height/Width. Where the sheet DOES give Height/Width, those are used as the pallet's load height and one footprint axis, with the missing footprint depth taken from footprintM.w.",
+  "_derivedPalletWeightPlausibilityNote": "plausibleMinKg/plausibleMaxKg bound the per-pallet weight this reader DERIVES from a document's own stated total in prose ('Total: 266 pallets | 35,910 kg' -> 135 kg/pallet — see item-assembler.ts statedTotalsFor / stated-pallet-totals.ts). A derived figure outside this band is treated as a likely misread (e.g. a garbled '35,910' arriving as '3,591,000') and defaultWeightKg is used instead — never priced. DO NOT confuse this with groupage-rates.json's maxPlausibleDerivedPalletKg (2500 kg, used by collection-run-parser.ts): that guards a DIFFERENT derivation (a groupage cargo-summary total ÷ pallet count) with a DIFFERENT failure mode — an out-of-band figure there is KEPT and merely flagged doubtful for operator confirmation, it is never silently discarded to a default. The two sound alike but are not interchangeable; do not unify them into one value.",
+  "palletDefaults": {
+    "footprintM": { "l": 1.2, "w": 1.0 },
+    "loadHeightM": 1.2,
+    "defaultWeightKg": 400,
+    "plausibleMinKg": 1,
+    "plausibleMaxKg": 1500
+  },
+  "columns": {
+    "code": 1,
+    "description": 1,
+    "dimensionH": 4,
+    "dimensionL": 5,
+    "dimensionP": 6,
+    "weight": 7,
+    "quantity": 8
+  },
+  "defaultCategory": "heavy-material",
+  "categoryPatterns": [
+    { "category": "glass-panel",     "pattern": "(Glass|Glazed|Tempered|Laminated|Polycarbonate|Fiberglass|Panel|Cladding|Ductwork|Facade)" },
+    { "category": "light-industrial","pattern": "(PVC|Epoxy|Polymer|Conduit|Coating)" },
+    { "category": "heavy-material",  "pattern": "(Steel|Iron|Concrete|Aluminum|Copper|Ceramic|Grating|Channel|Beam|Pillar|Wire Coil)" },
+    { "category": "appliance",       "pattern": "(TV|Television|Computer|Laptop|Monitor|Screen|Machine|Motor|Gear|Cookware|Appliance|Electronic)" }
+  ]
+}

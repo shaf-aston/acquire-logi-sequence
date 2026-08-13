@@ -1,0 +1,17 @@
+{
+  "standardPallet": {
+    "lengthMm": 1200,
+    "widthMm": 1000,
+    "usableHeightMm": 2200
+  },
+  "footprintClasses": {
+    "full": { "lengthMm": 1200, "widthMm": 1000, "loadedHeightMm": 1200, "stackable": true },
+    "half": { "lengthMm": 1200, "widthMm": 500, "loadedHeightMm": 1200, "stackable": true },
+    "quarter": { "lengthMm": 600, "widthMm": 500, "loadedHeightMm": 1000, "stackable": true },
+    "oversize": { "lengthMm": 2400, "widthMm": 1000, "loadedHeightMm": 1400, "stackable": false }
+  },
+  "stacking": {
+    "canSupportWeightKg": 1500,
+    "maxStackPressureKpa": 200
+  }
+}

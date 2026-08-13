@@ -1,0 +1,468 @@
+<title>PBS-01 · 3D stacking &amp; multi-van load allocation</title>
+<style>
+:root{
+  --ground:#F1F3F4;
+  --surface:#FBFCFC;
+  --surface-2:#FFFFFF;
+  --ink:#14191C;
+  --ink-2:#3E4A50;
+  --ink-3:#6E7C84;
+  --rule:#D5DBDE;
+  --rule-strong:#A7B3B9;
+  --accent:#B4470D;
+  --accent-soft:#F3E2D6;
+  --steel:#2C5A6B;
+  --font-body:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --font-display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+  --font-mono:ui-monospace,"SF Mono","Cascadia Mono","Segoe UI Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#101416;
+    --surface:#171C1F;
+    --surface-2:#1C2225;
+    --ink:#E8EDEF;
+    --ink-2:#B3BEC4;
+    --ink-3:#7E8C93;
+    --rule:#2B3438;
+    --rule-strong:#455258;
+    --accent:#E8823F;
+    --accent-soft:#33231A;
+    --steel:#79B4C7;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101416;
+  --surface:#171C1F;
+  --surface-2:#1C2225;
+  --ink:#E8EDEF;
+  --ink-2:#B3BEC4;
+  --ink-3:#7E8C93;
+  --rule:#2B3438;
+  --rule-strong:#455258;
+  --accent:#E8823F;
+  --accent-soft:#33231A;
+  --steel:#79B4C7;
+}
+
+body{background:var(--ground);color:var(--ink);font-family:var(--font-body);
+  font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased;margin:0;padding:0}
+.wrap{max-width:940px;margin:0 auto;padding:56px 24px 96px;display:flex;flex-direction:column;gap:32px}
+h1,h2,h3,p,ul,ol{margin:0}
+a{color:var(--accent)}
+
+/* ── masthead ─────────────────────────────────────────── */
+.mast{display:flex;flex-direction:column;gap:10px;padding-bottom:26px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--font-display);font-size:clamp(30px,5vw,44px);line-height:1.12;font-weight:600;text-wrap:balance}
+.standfirst{color:var(--ink-2);max-width:64ch;font-size:16px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);
+  letter-spacing:.04em;text-transform:uppercase;padding-top:6px}
+
+/* ── prose blocks between cards ───────────────────────── */
+.note{display:flex;flex-direction:column;gap:10px;max-width:70ch}
+.note h2{font-family:var(--font-display);font-size:21px;font-weight:600;letter-spacing:-.01em}
+.note p{color:var(--ink-2)}
+.note strong{color:var(--ink);font-weight:600}
+.note code{font-family:var(--font-mono);font-size:.88em;color:var(--steel)}
+.collapsed{list-style:none;padding:0;display:flex;flex-direction:column;gap:9px}
+.collapsed li{position:relative;padding-left:22px;color:var(--ink-2)}
+.collapsed li:before{content:"=";position:absolute;left:0;top:0;font-family:var(--font-mono);
+  font-size:13px;color:var(--accent);font-weight:700}
+
+/* ── the tree cards ───────────────────────────────────── */
+.c{background:var(--surface);border:1px solid var(--rule);border-top:2px solid var(--ink);
+  border-radius:3px;padding:22px 26px 24px}
+.h{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+.n{font-family:var(--font-mono);font-size:12px;color:var(--accent);letter-spacing:.06em;
+  font-variant-numeric:tabular-nums}
+.t{font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-.01em}
+.sub{font-size:13px;color:var(--ink-3);margin:0 0 20px;max-width:62ch}
+.l2{margin-left:3px;padding-left:16px;border-left:1px solid var(--rule-strong);margin-bottom:18px}
+.l2:last-child{margin-bottom:0}
+.l2h{font-size:13.5px;font-weight:650;color:var(--ink);margin:0 0 10px;position:relative;letter-spacing:.01em}
+.l2h:before{content:"";position:absolute;left:-16px;top:10px;width:11px;height:1px;background:var(--rule-strong)}
+.l2h .k{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-3);margin-right:7px;font-weight:400;
+  font-variant-numeric:tabular-nums}
+.l3{margin-left:2px;padding-left:14px;border-left:1px solid var(--rule);margin-bottom:12px}
+.l3:last-child{margin-bottom:0}
+.l3h{font-size:12.5px;color:var(--ink-2);margin:0 0 5px;position:relative;font-weight:600}
+.l3h:before{content:"";position:absolute;left:-14px;top:9px;width:9px;height:1px;background:var(--rule)}
+.l3h .k{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-right:6px;font-weight:400;
+  font-variant-numeric:tabular-nums}
+.l4{margin:0;padding:0;list-style:none}
+.l4 li{font-size:12.8px;color:var(--ink-2);line-height:1.62;padding-left:13px;position:relative;margin-bottom:2px}
+.l4 li:before{content:"";position:absolute;left:2px;top:9px;width:4px;height:1px;background:var(--rule-strong)}
+.g{color:var(--ink-3)}
+.tag{display:inline-block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.09em;
+  text-transform:uppercase;background:var(--accent-soft);color:var(--accent);
+  padding:1px 6px;border-radius:2px;margin-left:6px;vertical-align:1px}
+
+/* ── edges & traps ────────────────────────────────────── */
+.edges{background:var(--surface-2);border:1px solid var(--rule);border-left:3px solid var(--accent);
+  border-radius:3px;padding:22px 26px;display:flex;flex-direction:column;gap:16px}
+.edges h2{font-family:var(--font-display);font-size:20px;font-weight:600}
+.edge{display:flex;flex-direction:column;gap:3px}
+.edge b{font-size:13.5px;color:var(--ink)}
+.edge span{font-size:13.5px;color:var(--ink-2);max-width:74ch}
+
+footer{border-top:1px solid var(--rule);padding-top:18px;font-family:var(--font-mono);
+  font-size:11px;color:var(--ink-3);letter-spacing:.04em;line-height:1.8}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">PBS-01 · Product breakdown structure</div>
+  <h1>3D stacking &amp; multi-van load allocation</h1>
+  <p class="standfirst">The algorithm that decides where every box goes — which corner, which way up, which level, which van, and in what drop order — broken into parts you can build and tick off one at a time.</p>
+  <div class="meta">
+    <span>4 levels</span><span>6 product areas</span><span>Ordered by dependency</span><span>Decomposes the van-loading engine</span>
+  </div>
+</header>
+
+<section class="note">
+  <h2>What got collapsed first</h2>
+  <p>The load engine looks like a dozen features. It is really <strong>three engines wearing different clothes</strong>. Naming that before the tree is the point of the exercise — it stops the same physics being written five times.</p>
+  <ul class="collapsed">
+    <li><strong>Van packing, pallet building, and shared-truck stacking are one packer.</strong> Boxes-in-a-van, items-on-a-pallet, and pallets-in-a-truck are the same problem with a different container. One packer, three container adapters.</li>
+    <li><strong>Drop-order zoning, re-optimise, and the bulk fast path are not packers.</strong> They are <em>wrappers</em> that slice, re-feed or multiply the same packer. The packer never learns what a stop or a rearrange is.</li>
+    <li><strong>Fragile, brittle, crush limit, weight ceiling and reach height are one gate.</strong> Not five rules in five places — one legality function that the auto-packer, the drag editor and the re-optimiser all call. Change physics once, it changes everywhere.</li>
+  </ul>
+  <p>The ordering below is <strong>dependency order</strong>: nothing in an area can exist until the area above it does. That makes it double as a build sequence. The last area sits outside the sequence because it is underneath all of it.</p>
+</section>
+
+<div class="c">
+  <div class="h"><span class="n">1.0</span><span class="t">Cargo physics model</span></div>
+  <p class="sub">What a box <em>is</em> and what it can bear. Everything downstream is arithmetic on these numbers, so a wrong number here is a wrong load plan no amount of clever packing can fix.</p>
+
+  <div class="l2"><p class="l2h"><span class="k">1.1</span>Item construction</p>
+    <div class="l3"><p class="l3h"><span class="k">1.1.1</span>Dimension resolution</p><ul class="l4">
+      <li>Column-to-axis mapping <span class="g">— the sheet's Length / Width / Height become the van's front-back, side-side, up</span></li>
+      <li>Quantity expansion <span class="g">— one row saying "qty 3" becomes three separate boxes to place</span></li>
+      <li>Missing-dimension refusal <span class="g">— a blank size sets the item aside with a written reason, never a made-up number</span><span class="tag">never guess</span></li>
+      <li>Third-dimension derivation <span class="g">— two sizes plus a real weight can calculate the third; the one permitted exception</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">1.1.2</span>Weight resolution</p><ul class="l4">
+      <li>Stated weight pass-through</li>
+      <li>Density estimate <span class="g">— volume × the category's typical weight-per-cubic-metre when the sheet gives none</span></li>
+      <li>Per-pallet weight from a cargo summary <span class="g">— unit weight × quantity ÷ pallet count, with a sanity check on the result</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">1.2</span>Bearing strength — "what may sit on top of this"</p>
+    <div class="l3"><p class="l3h"><span class="k">1.2.1</span>Category limits</p><ul class="l4">
+      <li>Crush limit in kPa <span class="g">— how much squeeze per square metre the top face survives</span></li>
+      <li>Weight ceiling in kg <span class="g">— a hard cap on total kilos above; zero means nothing may ever sit on it</span></li>
+      <li>Category density table <span class="g">— feeds the weight estimate above</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">1.2.2</span>Material tightening</p><ul class="l4">
+      <li>Strength tier → kPa map <span class="g">— none / low / medium / high, set in config not code</span></li>
+      <li>Tighten-never-loosen rule <span class="g">— a machine guess may only <em>lower</em> a limit; a human override replaces it</span><span class="tag">invariant</span></li>
+      <li>Squashy discount <span class="g">— foam and fabric take a further cut because they compress</span></li>
+      <li>Brittle discount + low-tier cap <span class="g">— stone and glass are capped low first, then discounted, so an unconfident guess can't out-rank a correct one</span></li>
+      <li>Rotation lock <span class="g">— fixed / upright-only / free; which ways up this item may legally be turned</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">1.2.3</span>Classifier swap-seam</p><ul class="l4">
+      <li>Keyword rule engine <span class="g">— the default, works offline, no API key</span></li>
+      <li>LLM engine behind the same interface <span class="g">— same labels out, so nothing downstream knows which ran</span></li>
+      <li>Fallback chain with a dead-key path <span class="g">— a 401 from the provider degrades to rules instead of failing the quote</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">1.3</span>Bulk reduction — shrink a giant order before packing</p>
+    <div class="l3"><p class="l3h"><span class="k">1.3.1</span>Grouping strategies</p><ul class="l4">
+      <li>Identical-SKU blocking <span class="g">— fourteen thousand matching boxes get taped into a few big ones</span></li>
+      <li>Mixed-SKU pallet layering <span class="g">— different small boxes stand side by side, one layer high, on a standard pallet</span></li>
+      <li>Delicate isolation <span class="g">— fragile goods get their own pallet with nothing above them</span></li>
+      <li>Stated pallet totals <span class="g">— a sheet saying "14 pallets" is quoted as 14 pallets, not 14,000 loose pieces</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">1.3.2</span>Grouping guarantees</p><ul class="l4">
+      <li>Piece-count conservation check <span class="g">— grouping only regroups; a lost or invented box is a test failure</span></li>
+      <li>Weakest-member strength <span class="g">— a bundle is only ever as strong as the flimsiest box in it</span></li>
+      <li>Threshold config <span class="g">— the order size at which grouping switches on lives in JSON; small orders skip it entirely</span></li>
+    </ul></div>
+  </div>
+</div>
+
+<section class="note">
+  <p>Everything above produces numbers. Area 2 is the only place those numbers become a <strong>yes or no</strong>. It is deliberately the smallest area in the tree and the one with the most tests — because three separate front-ends depend on it agreeing with itself.</p>
+</section>
+
+<div class="c">
+  <div class="h"><span class="n">2.0</span><span class="t">The placement gate</span></div>
+  <p class="sub">One function answering one question: <em>may this box sit exactly here?</em> The auto-packer, the operator's mouse, and the re-optimiser all ask it. None of them are allowed their own opinion.</p>
+
+  <div class="l2"><p class="l2h"><span class="k">2.1</span>Geometric legality</p>
+    <div class="l3"><p class="l3h"><span class="k">2.1.1</span>Fit and collision</p><ul class="l4">
+      <li>Interior bounds test with clearance slack <span class="g">— does any part poke through a wall or the roof</span></li>
+      <li>Overlap test with a hair of tolerance <span class="g">— boxes touching is legal; a fraction-of-a-millimetre float wobble must not read as a clash</span><span class="tag">bug-prone</span></li>
+      <li>Orientation enumeration <span class="g">— all six ways up, filtered by the item's rotation lock</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">2.1.2</span>Spatial index</p><ul class="l4">
+      <li>Uniform grid over box footprints <span class="g">— so "what's near here?" checks a handful of boxes, not all of them</span></li>
+      <li>Superset contract <span class="g">— the grid may return extras; the caller re-runs the exact test, so extras cost time not correctness</span></li>
+      <li>Insertion-order preservation <span class="g">— results come back in the order boxes were placed, so adding up weights gives the identical answer every run</span><span class="tag">invariant</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">2.2</span>Support legality — the stack maths</p>
+    <div class="l3"><p class="l3h"><span class="k">2.2.1</span>Held-up checks</p><ul class="l4">
+      <li>Full-footprint coverage across several bases <span class="g">— a shelf may span two cabinets, but no corner may float</span></li>
+      <li>Fragile-base veto <span class="g">— a standard box may never rest on something marked fragile</span></li>
+      <li>Crush check by pressure <span class="g">— weight ÷ contact area, so a small heavy box can't punch through a wide light one</span></li>
+      <li>Weight-ceiling accumulation <span class="g">— running total of everything already resting on that base, plus the newcomer's share</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">2.2.2</span>Column push-down</p><ul class="l4">
+      <li>Recursive load transfer to the floor <span class="g">— new weight is charged to every box in the column below, not just the one directly under</span></li>
+      <li>Per-level re-check <span class="g">— five boxes each fine in a pair are still refused if the bottom one ends up carrying all four</span></li>
+      <li>Rounding-tolerance band <span class="g">— stops a load exactly at the limit flip-flopping between accept and reject</span><span class="tag">bug-prone</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">2.3</span>Human-reach legality</p>
+    <div class="l3"><p class="l3h"><span class="k">2.3.1</span>Reach cap</p><ul class="l4">
+      <li>Base-height ceiling <span class="g">— how high a worker can set a box down by hand; one fleet-wide number in config</span></li>
+      <li>Per-job override <span class="g">— a checkbox turns it off for this pack only, and the 3D editor honours the same setting</span></li>
+      <li>Rotation rescue <span class="g">— a box laid flat may clear the cap where standing up couldn't, so every allowed turn is tried against it</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">2.3.2</span>Reason attribution</p><ul class="l4">
+      <li>Reach-blocked vs genuinely-full split <span class="g">— re-runs the search with the cap lifted, only when something failed, to say which it was</span></li>
+      <li>Most-specific-failure-wins ordering <span class="g">— "crushes the cabinet below" beats a generic "won't fit"</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">2.4</span>Verdict reporting</p>
+    <div class="l3"><p class="l3h"><span class="k">2.4.1</span>Per-box load report</p><ul class="l4">
+      <li>Load-on-top figure per placed box <span class="g">— feeds the meter in the table and the colour in 3D</span></li>
+      <li>Overload flag reconciliation <span class="g">— the warning badge <em>is</em> the gate's own verdict, so the picture can never disagree with the physics</span></li>
+      <li>Whole-arrangement re-validation <span class="g">— one call that re-checks an entire van after any edit</span></li>
+    </ul></div>
+  </div>
+</div>
+
+<section class="note">
+  <p>Only now does a packer make sense. Note what area 3 does <em>not</em> contain: any judgement about safety. It scores spots the gate already approved — that separation is why a hand-dragged box and an auto-placed box obey identical rules.</p>
+</section>
+
+<div class="c">
+  <div class="h"><span class="n">3.0</span><span class="t">Single-container packer</span></div>
+  <p class="sub">Fill one container, one box at a time, never moving a box once it's down. Fast and always safe; it leaves a little space on the table on purpose.</p>
+
+  <div class="l2"><p class="l2h"><span class="k">3.1</span>Load ordering</p>
+    <div class="l3"><p class="l3h"><span class="k">3.1.1</span>The sort that decides the layout</p><ul class="l4">
+      <li>Sturdy-first grouping <span class="g">— anything fragile or brittle sinks to the back of the queue so it lands on top</span></li>
+      <li>Crush-limit descending <span class="g">— the strongest of the eligible group goes down first and becomes the platform</span></li>
+      <li>Volume descending <span class="g">— big sturdy boxes make a wide, flat floor for everything else</span></li>
+      <li>Stable id tie-break <span class="g">— identical items always resolve the same way, so two runs match exactly</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">3.2</span>Corner search — the "many sides" mechanism</p>
+    <div class="l3"><p class="l3h"><span class="k">3.2.1</span>Anchor generation</p><ul class="l4">
+      <li>Origin seed <span class="g">— an empty van offers exactly one corner: the front-left floor</span></li>
+      <li>Three-sided spawn per placed box <span class="g">— every box that lands opens a corner to its right, one beside it, and one on its top</span></li>
+      <li>Anchor cap with lowest-and-most-compact retention <span class="g">— keeps the list short on huge orders without losing the good spots</span></li>
+      <li>Corner-only limitation, documented <span class="g">— corners appear at box edges only, never projected onto walls or faces; this is the known gap</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">3.2.2</span>Cheap rejects before the expensive scan</p><ul class="l4">
+      <li>Payload short-circuit <span class="g">— would this box tip the van over its legal weight</span></li>
+      <li>Any-rotation fit test <span class="g">— is it simply too big for this container in every allowed turn</span></li>
+      <li>Remaining-volume test <span class="g">— is there less free space left than the box occupies</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">3.3</span>Spot scoring — the "many levels" mechanism</p>
+    <div class="l3"><p class="l3h"><span class="k">3.3.1</span>Score terms</p><ul class="l4">
+      <li>Build-upward reward <span class="g">— the dominant term; the packer is always trying to gain height</span></li>
+      <li>Sit-on-something reward <span class="g">— resting on an existing box beats opening a fresh patch of floor</span></li>
+      <li>Near-origin nudge <span class="g">— a tiny pull toward the corner so no stranded gaps are left behind</span></li>
+      <li>Lie-flat nudge <span class="g">— a tiny preference for the lowest profile, leaving headroom for another layer</span></li>
+      <li>Weighting ratio in config <span class="g">— the two "up" rewards outweigh the nudges by a thousand to one; that ratio is the tuning knob</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">3.4</span>Throughput guards</p>
+    <div class="l3"><p class="l3h"><span class="k">3.4.1</span>Hot-loop protection</p><ul class="l4">
+      <li>Full-container short-circuit <span class="g">— once nothing more fits, the next box is rejected instantly</span></li>
+      <li>No-room memo per box type <span class="g">— "boxes of this exact shape had no room" is remembered, so thousands of identical ones finish fast</span></li>
+      <li>Per-pack box cap <span class="g">— an upper bound on boxes in one pass, so a job always returns in a predictable time</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">3.5</span>Container adapters — one packer, three containers</p>
+    <div class="l3"><p class="l3h"><span class="k">3.5.1</span>Adapters</p><ul class="l4">
+      <li>Van interior adapter <span class="g">— the default: boxes into a vehicle's load space</span></li>
+      <li>Single-pallet adapter <span class="g">— loose items onto one pallet, with a height cap so the result still fits a van</span></li>
+      <li>Shared-truck adapter <span class="g">— whole pallets treated as the boxes, the truck as the container</span></li>
+      <li>Owner tagging through the adapter <span class="g">— each placement carries which company owns it, for per-company colour in the viewer</span></li>
+    </ul></div>
+  </div>
+</div>
+
+<section class="note">
+  <p>Area 4 is where "multiple vans" actually lives — and it answers a different question from area 3. Inside a van, ordering is decided by <strong>strength</strong>. Between vans, it is decided by <strong>cost</strong>. Nobody hand-steers heavy cargo into van one.</p>
+</section>
+
+<div class="c">
+  <div class="h"><span class="n">4.0</span><span class="t">Multi-container allocation</span></div>
+  <p class="sub">Which vehicles, how many, and — when there are several drops — what goes nearest the doors. Every wrapper here calls the area-3 packer unchanged.</p>
+
+  <div class="l2"><p class="l2h"><span class="k">4.1</span>Single-vehicle ranking</p>
+    <div class="l3"><p class="l3h"><span class="k">4.1.1</span>Rank rules</p><ul class="l4">
+      <li>Assemble-once, pack-into-each <span class="g">— items are built one time and reused across every candidate vehicle</span></li>
+      <li>Fits-everything first, then tightest fill, then most-placed <span class="g">— the ranking order, in that priority</span></li>
+      <li>Honest single-van flag <span class="g">— tells the quote plainly whether one vehicle really covers the job</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">4.2</span>Cheapest fleet set</p>
+    <div class="l3"><p class="l3h"><span class="k">4.2.1</span>The search</p><ul class="l4">
+      <li>Branch-and-bound over vehicle combinations <span class="g">— minimises total per-mile cost, since the trip distance is the same whichever vans you pick</span></li>
+      <li>Step-bounded greedy fallback <span class="g">— past a set number of search steps it switches to a simpler split, so the loading dock never waits</span></li>
+      <li>Payload-aware cost rate <span class="g">— a heavily loaded van costs more per mile than an empty one</span></li>
+      <li>Deterministic tie-break <span class="g">— two near-identical fleet options always resolve the same way</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">4.2.2</span>Fleet source</p><ul class="l4">
+      <li>File-backed fleet with an in-memory override <span class="g">— the swap-seam that lets a session add a vehicle without editing config</span></li>
+      <li>Size-class inference for a session-added van <span class="g">— works out where a new vehicle sits against the existing fleet</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">4.3</span>Drop-order zoning</p>
+    <div class="l3"><p class="l3h"><span class="k">4.3.1</span>Banding</p><ul class="l4">
+      <li>Dynamic depth bands, door-first <span class="g">— the first delivery sits at the doors, later ones deeper toward the cab; no digging</span></li>
+      <li>Band-boundary clearance sliver <span class="g">— a hair of space keeps zones physically distinct and guards against float drift</span></li>
+      <li>Untagged-cargo final band <span class="g">— items with no drop tag go deepest rather than being dropped for lacking a tag</span></li>
+      <li>Payload threaded across bands <span class="g">— weight is a whole-van limit, so each band gets what's left, not a fresh allowance</span></li>
+      <li>Contiguous continuation across vehicles <span class="g">— a stop cut off at van one's cab resumes at van two's doors</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">4.3.2</span>Drop attribution</p><ul class="l4">
+      <li>Strict Stop-column parse <span class="g">— only a bare whole number counts; headings and sub-totals are skipped, not guessed at</span></li>
+      <li>No-column neutrality <span class="g">— a single-drop sheet is completely unaffected</span></li>
+      <li>Per-row drop tags surfaced in the UI <span class="g">— the operator sees and can correct the attribution</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">4.4</span>Bulk fast path</p>
+    <div class="l3"><p class="l3h"><span class="k">4.4.1</span>Pack-one-multiply</p><ul class="l4">
+      <li>Representative-van real pack <span class="g">— one vehicle packed with genuine geometry, then multiplied arithmetically</span></li>
+      <li>Remainder packed for real <span class="g">— the partial last van goes through the normal allocator</span></li>
+      <li>Identical-result guarantee <span class="g">— for a single-product order the fleet must match what the slow path produces, pinned by test</span><span class="tag">invariant</span></li>
+      <li>Eligibility test <span class="g">— a mixed order falls back to the normal path rather than approximating</span></li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="c">
+  <div class="h"><span class="n">5.0</span><span class="t">Operator control surface</span></div>
+  <p class="sub">Where a person overrides the algorithm — and the machinery that stops an override from producing an illegal van. The 3D viewer itself already exists and is untouched; these are the algorithm-side pieces it calls.</p>
+
+  <div class="l2"><p class="l2h"><span class="k">5.1</span>Re-optimise</p>
+    <div class="l3"><p class="l3h"><span class="k">5.1.1</span>Scope</p><ul class="l4">
+      <li>Per-vehicle re-pack <span class="g">— re-runs the real packer over exactly what is in this van now, keeping the operator's van-to-van decisions</span></li>
+      <li>Whole-fleet re-pack <span class="g">— same, across every vehicle at once</span></li>
+      <li>Real payload enforcement <span class="g">— over-weight units come back as unplaced with the packer's own reason, never quietly loaded</span></li>
+      <li>Drop-order preservation <span class="g">— a multi-drop van re-packs through the zoned wrapper, so re-optimising cannot destroy the delivery banding</span><span class="tag">bug-prone</span></li>
+      <li>No-gain no-op <span class="g">— re-optimising twice returns the same layout</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">5.2</span>Manual edit, same gate</p>
+    <div class="l3"><p class="l3h"><span class="k">5.2.1</span>Edit actions</p><ul class="l4">
+      <li>Drag with snap-onto-support <span class="g">— a dragged box settles onto whatever holds it, and commits only if the whole van still passes</span></li>
+      <li>Move between vehicles <span class="g">— finds a safe spot in the target, then re-validates that entire vehicle</span></li>
+      <li>Unplace to a persistent tray <span class="g">— the tray lives above the per-van view, so nothing is lost when switching vehicles</span></li>
+      <li>Flattest-orientation default on drop <span class="g">— a box that only failed standing up arrives pre-turned, instead of repeating the same failure</span></li>
+      <li>Reset to computed plan</li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">5.3</span>Truth surfaces — showing what the algorithm couldn't do</p>
+    <div class="l3"><p class="l3h"><span class="k">5.3.1</span>Never-guess displays</p><ul class="l4">
+      <li>Unplaced list with written reasons <span class="g">— visible text, not a hover tip, at result level rather than buried in the 3D canvas</span></li>
+      <li>Unit-accurate counts <span class="g">— tiles count real items, not the bundles they were grouped into</span></li>
+      <li>Load-on-top meter per box <span class="g">— how close each item is to its crush limit, in the table and as colour in 3D</span></li>
+      <li>Reach-blocked banner <span class="g">— counts items refused only by the height cap and points at the toggle that lifts it</span></li>
+      <li>Per-stop colouring <span class="g">— which band belongs to which drop, at a glance</span></li>
+    </ul></div>
+  </div>
+</div>
+
+<section class="note">
+  <p>The last area is not a stage. It sits underneath every branch above and is the reason the others can be trusted.</p>
+</section>
+
+<div class="c">
+  <div class="h"><span class="n">6.0</span><span class="t">Cross-cutting foundations</span></div>
+  <p class="sub">Config, determinism, diagnostics and the honest list of gaps. Underneath all five areas, sequenced with none of them.</p>
+
+  <div class="l2"><p class="l2h"><span class="k">6.1</span>Configuration surface</p>
+    <div class="l3"><p class="l3h"><span class="k">6.1.1</span>Tunable knobs, none in code</p><ul class="l4">
+      <li>Fleet and per-mile rates</li>
+      <li>Category strength matrix and densities</li>
+      <li>Strength tier → pressure map</li>
+      <li>Grouping thresholds and pallet spec</li>
+      <li>Clearance, reach cap and search bounds <span class="g">— tolerances and limits as named values, not numbers scattered through the packer</span></li>
+      <li>Single environment reader <span class="g">— one module reads environment settings; nothing else does</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">6.2</span>Determinism guarantees</p>
+    <div class="l3"><p class="l3h"><span class="k">6.2.1</span>Same input, same plan</p><ul class="l4">
+      <li>No clocks, no randomness anywhere in the packing path</li>
+      <li>Stable sorts throughout <span class="g">— equal items never swap places between runs</span></li>
+      <li>Fixed-order weight summation <span class="g">— adding the same numbers in a different order gives a different last decimal, which can flip an accept into a reject</span><span class="tag">invariant</span></li>
+      <li>Golden-master test <span class="g">— an optimisation that changes even one placement fails the build</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">6.3</span>Diagnostics</p>
+    <div class="l3"><p class="l3h"><span class="k">6.3.1</span>Why isn't this van fuller?</p><ul class="l4">
+      <li>Missed-opportunity vs physical-limit verdict <span class="g">— the one signal that says whether low fill is a bug to fix or physics working correctly</span></li>
+      <li>One verdict, shown in two places <span class="g">— the behind-the-scenes trace and the on-screen panel use the same answer, so they cannot disagree</span></li>
+      <li>Command-line pack trace <span class="g">— replay a job's packing decisions outside the app</span></li>
+      <li>Per-van fill panel <span class="g">— the same verdict shown beside the 3D model</span></li>
+    </ul></div>
+  </div>
+
+  <div class="l2"><p class="l2h"><span class="k">6.4</span>Known gaps, held open deliberately</p>
+    <div class="l3"><p class="l3h"><span class="k">6.4.1</span>Buildable improvements</p><ul class="l4">
+      <li>Wall-and-face corner projection <span class="g">— today corners only appear at box edges, so some valid pockets never get tried</span></li>
+      <li>Settle pass <span class="g">— a cheap final nudge of boxes toward the floor to reclaim gaps that opened later</span></li>
+      <li>Retry pass for unplaced items <span class="g">— one second attempt for anything an earlier box crowded out</span></li>
+    </ul></div>
+    <div class="l3"><p class="l3h"><span class="k">6.4.2</span>Out of scope, stated as such</p><ul class="l4">
+      <li>Braking, cornering and vibration forces <span class="g">— only up-and-down loads are modelled today</span></li>
+      <li>Centre of gravity and axle-weight balance</li>
+      <li>Step-by-step load sequence for the loader <span class="g">— the plan says where, not the order to carry them in</span></li>
+    </ul></div>
+  </div>
+</div>
+
+<div class="edges">
+  <h2>The four edges that actually matter</h2>
+  <div class="edge">
+    <b>Area 3 has no opinion about safety — and that's the whole architecture.</b>
+    <span>The packer only <em>scores</em> spots that area 2 already approved. So any physics change is a single edit in the gate, and it propagates to auto-packing, mouse-dragging and re-optimising for free. The moment a packer starts making its own legality call, the three surfaces begin to disagree and every bug becomes a hunt for which one is right.</span>
+  </div>
+  <div class="edge">
+    <b>Load-order rules are wrappers, not packer features.</b>
+    <span>Drop-order zoning slices the container and hands each slice to the untouched packer. That means the next load-order rule you want — weight forward, axle balance, heaviest-last — is a <em>new wrapper</em>, not a packer rewrite. Cheap now; very expensive if the first one is written into the packer instead.</span>
+  </div>
+  <div class="edge">
+    <b>Determinism is retroactively impossible.</b>
+    <span>Fixed-order summation is why the same van always gives the same verdict at the exact crush limit. Introduce parallel packing, or a lookup whose order isn't fixed, anywhere in areas 2–4, and the results shift silently — no crash, just a plan that quietly differs from yesterday's. Retro-fitting this after the fact means re-deriving every stored plan. Build it in from day one, or never.</span>
+  </div>
+  <div class="edge">
+    <b>The unplaced list is the product, not an error state.</b>
+    <span>Every branch feeds it: refused sizes from 1.1, crush refusals from 2.2, reach refusals from 2.3, overflow from 4.2. It is the one surface where the system admits what it couldn't do, and it is the difference between a quote an operator trusts and one they re-check by hand. Under-build it and the rest of the engine's honesty is invisible.</span>
+  </div>
+</div>
+
+<footer>
+  PBS-01 · four levels · listed in the PBS registry<br>
+  Decomposes the van-loading engine — behaviour described in the packing-logic document
+</footer>
+
+</div>

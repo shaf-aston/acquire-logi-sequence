@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "pickupLabels": ["collection", "collect from", "pickup", "pick up", "origin", "loading"],
+  "dropLabels": ["delivery", "deliver to", "drop", "drop off", "destination", "ship to", "unloading"],
+  "postcodePattern": "\\b[A-Z]{1,2}[0-9][A-Z0-9]?\\s*[0-9][A-Z]{2}\\b",
+  "maxLineLength": 160,
+  "_tableColumns": "Header-name patterns (case-insensitive regex) that let the built-in reader pull stops straight out of a structured table's columns — the reliable path for table-formatted quotations, where a whole stop (company + address + notes) sits in one long row the line-scanner would skip. A table is treated as a stop list only if a header matches addressColumnPattern; the row's kind (pickup vs delivery) comes from the typeColumn cell, else from the address column's own header (e.g. 'Collection Address' vs 'Delivery Address'), classified against pickupLabels/dropLabels — no new hardcoded words.",
+  "addressColumnPattern": "address",
+  "typeColumnPattern": "^type|stop type",
+  "companyColumnPattern": "company|contact|origin",
+  "_outboundHubColumnPattern": "Header of the destination/outbound hub column in a hub-transfer table. Its cell postcode aims the trunk's destination hub when a milk-round sheet lists only collection stops (no delivery addresses to be nearest to).",
+  "outboundHubColumnPattern": "destination hub|outbound hub",
+  "_collectionSignals": "Document-level phrases that mark a PDF as a COLLECTION/pickup round (not a delivery). Any one hit flips the quote to collection mode. Kept as strong multi-word phrases so a single stray 'collection' label on a delivery sheet never trips it.",
+  "collectionSignals": ["milk round", "milk-round", "collection run", "collection round", "collection schedule", "pickup round", "pickup schedule", "consolidation"]
+}

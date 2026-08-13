@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "hubs": [
+    {
+      "id": "hub-london",
+      "name": "London & South East",
+      "catchment": [
+        "E",
+        "EC",
+        "N",
+        "NW",
+        "SE",
+        "SW",
+        "W",
+        "WC",
+        "EN",
+        "HA",
+        "IG",
+        "RM",
+        "UB",
+        "TW",
+        "KT",
+        "SM",
+        "CR",
+        "BR",
+        "DA",
+        "WD",
+        "SL",
+        "GU"
+      ],
+      "address": "G-Park London Park Royal, 12 Waxlow Road, London NW10 7NU"
+    },
+    {
+      "id": "hub-manchester",
+      "name": "Manchester (North West)",
+      "catchment": [
+        "M",
+        "BL",
+        "OL",
+        "SK",
+        "WA",
+        "WN",
+        "PR",
+        "BB",
+        "FY",
+        "L",
+        "CH",
+        "CW",
+        "LA",
+        "CA"
+      ],
+      "address": "G-Park Manchester, 1 Ashburton Road West, Trafford Park, Manchester M17 1TD"
+    },
+    {
+      "id": "hub-leeds",
+      "name": "Leeds (Yorkshire & Humber)",
+      "catchment": [
+        "LS",
+        "BD",
+        "HD",
+        "HX",
+        "WF",
+        "HG",
+        "YO",
+        "DN",
+        "S",
+        "HU"
+      ],
+      "address": "Unit A1-A4 Skelton Grange Road, Stourton, Leeds LS10 1RZ"
+    },
+    {
+      "id": "hub-newcastle",
+      "name": "Newcastle (North East)",
+      "catchment": [
+        "NE",
+        "SR",
+        "DH",
+        "DL",
+        "TS"
+      ],
+      "address": "Follingsby Park, Follingsby Avenue, Gateshead NE10 8YF"
+    },
+    {
+      "id": "hub-nottingham",
+      "name": "Nottingham (East Midlands)",
+      "catchment": [
+        "NG",
+        "DE",
+        "LE",
+        "NN",
+        "MK",
+        "LN"
+      ],
+      "address": "SEGRO Logistics Park East Midlands Gateway, Wilders Way, Kegworth, Derby DE74 2DL"
+    },
+    {
+      "id": "hub-bristol",
+      "name": "Bristol (South West)",
+      "catchment": [
+        "BS",
+        "BA",
+        "GL",
+        "SN",
+        "TA",
+        "EX",
+        "PL",
+        "TQ",
+        "TR"
+      ],
+      "address": "DHL Distribution Centre, Central Park, Palmer Avenue, Avonmouth, Bristol BS10 7ES"
+    },
+    {
+      "id": "hub-southampton",
+      "name": "Southampton (South Coast)",
+      "catchment": [
+        "SO",
+        "PO",
+        "BH",
+        "DT",
+        "SP"
+      ],
+      "address": "Stoke Park, Tower Lane, Eastleigh, Southampton SO50 6NZ"
+    },
+    {
+      "id": "hub-reading",
+      "name": "Reading (Thames Valley)",
+      "catchment": [
+        "RG",
+        "OX",
+        "HP",
+        "LU",
+        "AL",
+        "SG",
+        "CM"
+      ],
+      "address": "Arlington Business Park, Theale, Reading RG7 4SD"
+    },
+    {
+      "id": "hub-norwich",
+      "name": "Norwich (East Anglia & Kent)",
+      "catchment": [
+        "NR",
+        "IP",
+        "CB",
+        "PE",
+        "CO",
+        "SS",
+        "CT",
+        "ME",
+        "TN",
+        "RH",
+        "BN"
+      ],
+      "address": "East Anglia Logistics Hub, Falcon Road, Norwich NR16 2FB"
+    },
+    {
+      "id": "hub-birmingham",
+      "name": "Birmingham (Midlands)",
+      "catchment": [
+        "B",
+        "CV",
+        "WV",
+        "WS",
+        "DY",
+        "WR",
+        "HR",
+        "TF",
+        "ST"
+      ],
+      "address": "Unit 3, Hams Hall Distribution Park, Birmingham B46 1AL"
+    },
+    {
+      "id": "hub-edinburgh",
+      "name": "Edinburgh (Scotland)",
+      "catchment": [
+        "EH",
+        "G",
+        "FK",
+        "KY",
+        "ML",
+        "PA",
+        "KA",
+        "TD",
+        "DD",
+        "PH",
+        "DG"
+      ],
+      "address": "Eurocentral Distribution Park, Maxim 6, Motherwell, Edinburgh EH1 3EG"
+    }
+  ]
+}

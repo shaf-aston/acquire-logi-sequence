@@ -1,0 +1,9 @@
+{
+  "note": "Tunable Three.js scene knobs for the interactive van load-plan viewer — lighting, camera, render-quality, and drag-interaction settings. Purely visual/interaction tuning, no domain/business meaning. dragSnapStepM = how finely (metres) a dragged box follows the cursor: smaller = smoother/finer, larger = chunkier. Edit freely.",
+  "ambientLightIntensity": 0.7,
+  "directionalLight": { "position": [5, 8, 5], "intensity": 0.8 },
+  "gridDivisions": 6,
+  "cameraFovDeg": 45,
+  "dprRange": [1, 2],
+  "dragSnapStepM": 0.05
+}

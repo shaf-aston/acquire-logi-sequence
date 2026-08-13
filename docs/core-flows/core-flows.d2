@@ -1,0 +1,141 @@
+# FleetView — Core Quote Flows (what is actually coded)
+# Render:  "C:\Program Files\D2\d2.exe" --layout elk --theme 0 --pad 40 core-flows.d2 core-flows.svg
+# Step numbers here match core-flows.md exactly — change one, change the other.
+
+direction: down
+
+banner: "How a quote is produced — the three core flows" {
+  near: top-center
+  shape: text
+  style: { font-size: 26; bold: true }
+}
+
+strap: "Every job enters the SAME front door (Step 0), then the operator sends it down ONE of three lanes." {
+  near: top-left
+  shape: text
+  style: { font-size: 14; italic: true }
+}
+
+# ───────────────────────── SHARED ENTRY ─────────────────────────
+entry: "STEP 0 · SHARED ENTRY  —  every job starts the same way" {
+  direction: down
+  style: {
+    fill: "#eef4ff"
+    stroke: "#2b5fb3"
+    stroke-width: 2
+    font-size: 15
+    bold: true
+  }
+
+  e1: "0.1  Receive the upload\n(read the raw PDF bytes; nothing checked yet)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e2: "0.2  Check the file is safe\n(size limit + proof it is really a PDF)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e3: "0.3  Read the pages\n(the PDF's own text first; OCR only if scanned)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e4: "0.4  Build the cargo tables\n(only proper grid tables are picked up)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e5: "0.5  Archive the source\n(optional — off by default)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e6: "0.6  Tag each item fragile or standard\n(keyword rules; unsure → flag for review)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e7: "0.7  Find pickup & delivery addresses\n(read only — not yet checked on a map)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e8: "0.8  Derive routing hints\n(stop numbers, collect-vs-deliver; all advisory)" { style.fill: "#ffffff"; style.stroke: "#2b5fb3" }
+  e9: "0.9  Hand back one structured result\n(no price yet, no mode chosen)" { style.fill: "#dbe8ff"; style.stroke: "#2b5fb3" }
+
+  e1 -> e2 -> e3 -> e4 -> e5 -> e6 -> e7 -> e8 -> e9
+}
+
+entry_note: "Not here: no strength / crush check yet, no distance, no van choice, no price.\nThe front door only reads and labels the PDF." {
+  shape: page
+  style: { fill: "#fff5f5"; stroke: "#c0392b"; stroke-dash: 3; font-size: 12; italic: true }
+}
+
+pick: "Operator picks the job type" {
+  shape: diamond
+  style: { fill: "#fef3d7"; stroke: "#b9880f"; font-size: 15; bold: true }
+}
+
+entry.e9 -> entry_note: "" { style.stroke-dash: 3; style.stroke: "#c0392b" }
+entry.e9 -> pick { style.stroke-width: 2; style.stroke: "#2b5fb3" }
+
+# ───────────────────────── LANE A: POINT TO POINT ─────────────────────────
+p2p: "LANE A · POINT-TO-POINT   (one pickup → one drop, in our own vans)" {
+  direction: down
+  style: { fill: "#eafaf1"; stroke: "#1e8b53"; stroke-width: 2; font-size: 15; bold: true }
+
+  sub: "The default lane. Used when the job has just one drop." { shape: text; style: { font-size: 12; italic: true } }
+
+  a1: "A.1  Receive the cargo & validate\n(sane sizes and whole quantities)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a2: "A.2  Assemble the load units\n(real 3-D items + durability / which-way-up)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a3: "A.3  Optional bulk consolidation\n(off by default; huge lists → placeable blocks)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a4: "A.4  Pack in 3-D & rank the vans\n(tries orientations, respects reach height)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a5: "A.5  Pick the cheapest set of vans\n(overflow is shown, never silently dropped)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a6: "A.6  Independently re-check the plan is safe\n(a bad plan is blocked, not shipped)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a7: "A.7  Measure the drive: one pickup → one drop\n(Google Maps, or straight-line if no key)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a8: "A.8  Build the price\n(round-trip miles + fuel + driver time + fragile fee)" { style.fill: "#ffffff"; style.stroke: "#1e8b53" }
+  a9: "A.9  Save the quote (and optionally email it)" { style.fill: "#d5f2e2"; style.stroke: "#1e8b53" }
+
+  sub -> a1
+  a1 -> a2 -> a3 -> a4 -> a5 -> a6 -> a7 -> a8 -> a9
+}
+
+p2p_note: "Not here: no extra stops, no shared truck, no drop-order zoning.\nThe return trip is estimated as ×2 the outbound, not re-measured." {
+  shape: page
+  style: { fill: "#fff5f5"; stroke: "#c0392b"; stroke-dash: 3; font-size: 12; italic: true }
+}
+
+# ───────────────────────── LANE B: MULTI-STOP ─────────────────────────
+multi: "LANE B · MULTI-STOP   (one van, an ordered chain of stops)" {
+  direction: down
+  style: { fill: "#fff6e9"; stroke: "#c9821a"; stroke-width: 2; font-size: 15; bold: true }
+
+  sub: "Two shapes: 1 pickup + many drops  (delivery)\nor  a depot + many pickups  (collection)" { shape: text; style: { font-size: 12; italic: true } }
+
+  b1: "B.1  Operator builds the ordered stop list" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b2: "B.2  Validate the request\n(every stop needs an address + valid kind)" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b3: "B.3  Stop-mix rule check\n(clear error naming the bad stop + the fix)" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b4: "B.4  Route the whole chain in one call\n(one-way; no return leg billed for delivery)" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b5: "B.5  Distance via Google, or straight-line fallback\n(fallback keeps the typed order)" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b6: "B.6  Work out the visited order\n(collection proves each pickup appears once)" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b7: "B.7  Price the trip\n(reuses Lane A's engine + per-stop handling)" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b8: "B.8  Add hub fees & advisory flags\n(flags never block a stop)" { style.fill: "#ffffff"; style.stroke: "#c9821a" }
+  b9: "B.9  Return the quote" { style.fill: "#ffe9cc"; style.stroke: "#c9821a" }
+
+  sub -> b1
+  b1 -> b2 -> b3 -> b4 -> b5 -> b6 -> b7 -> b8 -> b9
+}
+
+multi_note: "Not here: no mixed pickup-and-drop 'milk run', no re-packing per stop.\nIt reuses the already-packed vans and Lane A's price engine." {
+  shape: page
+  style: { fill: "#fff5f5"; stroke: "#c0392b"; stroke-dash: 3; font-size: 12; italic: true }
+}
+
+# ───────────────────────── LANE C: GROUPAGE ─────────────────────────
+group: "LANE C · GROUPAGE   (many companies share the same trucks, via hubs)" {
+  direction: down
+  style: { fill: "#f3edfb"; stroke: "#6b3fa0"; stroke-width: 2; font-size: 15; bold: true }
+
+  g1: "C.1  Hub network is set up (prerequisite)\n(11 UK hubs, each owns postcode areas)" { style.fill: "#ece2f7"; style.stroke: "#6b3fa0" }
+  g2: "C.2  Read the manifest into draft consignments\n(several companies' part-loads at once)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g3: "C.3  Parse the collection-run table offline\n(pallet count + size; no AI, no network)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g4: "C.4  Read / calculate per-pallet weight\n(trusted or worked out — never guessed)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g5: "C.5  Collapse hub double-counting\n(one trunk load; only when the two legs match)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g6: "C.6  Overlay the manifest's own hubs\n(this session only; widen the catchment)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g7: "C.7  Quote one consignment\n(hubs → demand → path → capacity → price)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g8: "C.8  Capacity — a configurable ceiling\n(soft weight cap; hard truck-leg stop)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g9: "C.9  Group loads onto shared trucks + 3-D plan\n(auto-splits across trucks when over capacity)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g10: "C.10  Book it: server re-quote + anti-drift\n(re-price on the server; lock the total)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g11: "C.11  Track the shipment through its lifecycle\n(booked → collected → in transit → delivered)" { style.fill: "#ffffff"; style.stroke: "#6b3fa0" }
+  g12: "C.12  Per-leg load view & on-demand hub distance\n(read-only; enforces nothing)" { style.fill: "#e6d9f5"; style.stroke: "#6b3fa0" }
+
+  g1 -> g2 -> g3 -> g4 -> g5 -> g6 -> g7 -> g8 -> g9 -> g10 -> g11 -> g12
+}
+
+group_note: "Not here: no spreadsheet import; price is flat per pallet-space (no mileage, no 3-D volume).\nOnly hub-routed quotes can be booked. Records are flat JSON files, not a database." {
+  shape: page
+  style: { fill: "#fff5f5"; stroke: "#c0392b"; stroke-dash: 3; font-size: 12; italic: true }
+}
+
+# ───────────────────────── BRANCHES ─────────────────────────
+pick -> p2p: "one drop" { style.stroke: "#1e8b53"; style.stroke-width: 2 }
+pick -> multi: "several stops, one customer" { style.stroke: "#c9821a"; style.stroke-width: 2 }
+pick -> group: "many customers share a truck" { style.stroke: "#6b3fa0"; style.stroke-width: 2 }
+
+p2p -> p2p_note: "" { style.stroke-dash: 3; style.stroke: "#c0392b" }
+multi -> multi_note: "" { style.stroke-dash: 3; style.stroke: "#c0392b" }
+group -> group_note: "" { style.stroke-dash: 3; style.stroke: "#c0392b" }

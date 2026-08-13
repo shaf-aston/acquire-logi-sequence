@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "_comment": "Editable fragility ruleset. Decision order: (1) overrides — exact phrases that force a result; (2) longest matching keyword wins (more specific beats generic); (3) on a length tie, fragile wins (safer for transport); (4) no match → defaultWhenUnmatched with confident=false (flagged for review). Keyword matching is case-insensitive, whole-word, and plural-aware (tile→tiles). Add morphological variants (wooden, mirrored, glazed) explicitly.",
+
+  "itemTableHeaderKeywords": [
+    "description", "material", "item", "product", "code",
+    "weight", "height", "width", "depth", "length", "dimension",
+    "qty", "quantity", "price", "unit",
+    "goods", "cargo", "quotation", "retail", "reference", "shipment"
+  ],
+  "minHeaderMatches": 2,
+
+  "textColumnKeywords": [
+    "description", "material", "item", "product", "code", "notes", "type"
+  ],
+
+  "overrides": [
+    { "phrase": "glass reinforced plastic", "fragility": "standard" },
+    { "phrase": "grp", "fragility": "standard" },
+    { "phrase": "fibreglass", "fragility": "standard" },
+    { "phrase": "fiberglass", "fragility": "standard" },
+    { "phrase": "glass wool", "fragility": "standard" },
+    { "phrase": "glass fibre", "fragility": "standard" },
+    { "phrase": "tempered glass", "fragility": "fragile" },
+    { "phrase": "toughened glass", "fragility": "fragile" },
+    { "phrase": "carbon fibre reinforced", "fragility": "standard" },
+    { "phrase": "carbon fiber reinforced", "fragility": "standard" },
+    { "phrase": "carbon fibre composite", "fragility": "standard" },
+    { "phrase": "carbon fiber composite", "fragility": "standard" }
+  ],
+
+  "fragile": {
+    "keywords": [
+      "glass", "glazed", "glazing", "mirror", "mirrored", "crystal", "cristallo", "vetro",
+      "ceramic", "ceramica", "porcelain", "tile", "tiled", "earthenware", "terracotta",
+      "marble", "marmo", "granite", "quartz", "stone", "slate", "sandstone",
+      "carbon fibre", "carbon fiber",
+      "screen", "display", "monitor", "tv", "lcd", "oled", "led panel", "touchscreen",
+      "lamp", "light fitting", "lighting", "luminaire", "chandelier", "bulb",
+      "acrylic", "plexiglass", "perspex", "resin panel",
+      "electronics", "electronic", "sensor", "circuit", "pcb",
+      "appliance", "oven", "hob", "cooktop", "fridge", "refrigerator", "dishwasher", "microwave",
+      "porcelain sink", "ceramic basin"
+    ]
+  },
+
+  "standard": {
+    "keywords": [
+      "steel", "stainless", "galvanised", "galvanized", "mild steel", "structural steel", "rebar",
+      "iron", "ductile iron", "cast iron", "wrought iron",
+      "concrete", "pre-cast", "precast", "cement", "mortar", "aggregate", "gravel", "sand",
+      "aluminium", "aluminum", "brass", "copper", "zinc", "bronze", "metal", "alloy",
+      "hdpe", "ldpe", "pvc", "upvc", "polymer", "polyurea", "polyethylene", "plastic", "rubber", "composite",
+      "timber", "wood", "wooden", "plywood", "mdf", "chipboard", "osb", "laminate", "laminated board",
+      "pipe", "tube", "valve", "fitting", "beam", "girder", "column", "slab", "sheet", "plate",
+      "ductwork", "duct", "membrane", "insulation", "foam", "fabric", "textile", "carpet",
+      "cabinet", "carcass", "fixing", "fastener", "bolt", "nut", "screw", "bracket", "hinge"
+    ]
+  },
+
+  "defaultWhenUnmatched": "standard"
+}

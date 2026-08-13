@@ -1,0 +1,47 @@
+{
+  "name": "logi-ingestion",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "ingest": "tsx src/cli/ingest.mts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts",
+    "pack:report": "vitest run src/lib/packing/__tests__/stacking-report.test.ts",
+    "pack:debug": "tsx src/cli/pack-debug.mts",
+    "scenarios": "tsx src/cli/scenarios.mts",
+    "fixtures:gen": "tsx scripts/generate-fixtures.mts"
+  },
+  "dependencies": {
+    "@mistralai/mistralai": "^2.3.0",
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.6.1",
+    "@vis.gl/react-google-maps": "^1.9.0",
+    "mupdf": "^1.27.0",
+    "next": "^15.1.0",
+    "nodemailer": "^9.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tesseract.js": "^7.0.0",
+    "three": "^0.185.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/nodemailer": "^8.0.1",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/three": "^0.185.0",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^15.1.0",
+    "playwright": "^1.61.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "_comment": "Editable durability ruleset for the no-AI fallback engine (DurabilityRuleClassifier), and the reference the Groq engine's prompt is grounded on. Decision order: (1) overrides -- exact phrases that force a full result; (2) tier keywords -- WEAKEST matched tier wins (order none < low < medium < high), so a mixed material (e.g. 'Solid Wood / Foam') resolves to its weakest component ('none'), matching the Groq engine's weakest-component rule and the conservative-bias principle; (3) a hollow-build keyword knocks the matched tier down one step; (4) brittleKeywords force brittle=true independent of tier; (5) deformableKeywords force deformable=true; (6) orientationKeywords set orientationLock (fixed beats partial on a tie); (7) no tier keyword matched -> defaultTier with confident=false, flagged for review. Matching is case-insensitive, whole-word, plural-aware -- same convention as fragility-rules.json.",
+
+  "overrides": [
+    { "phrase": "tempered glass", "durabilityTier": "low", "brittle": true, "deformable": false, "orientationLock": "none" },
+    { "phrase": "toughened glass", "durabilityTier": "low", "brittle": true, "deformable": false, "orientationLock": "none" }
+  ],
+
+  "tiers": {
+    "none": { "keywords": ["foam", "fabric", "textile", "cushion", "pillow", "sponge", "cotton wool"] },
+    "low": { "keywords": ["cardboard", "paperboard", "corrugated", "thin plastic", "plastic sheet", "acrylic", "plexiglass", "perspex"] },
+    "medium": { "keywords": ["mdf", "chipboard", "osb", "particleboard", "engineered wood", "laminate", "laminated board", "plywood"] },
+    "high": { "keywords": ["solid wood", "hardwood", "timber", "steel", "stainless", "galvanised", "galvanized", "iron", "aluminium", "aluminum", "concrete", "metal", "alloy", "brass", "copper"] }
+  },
+
+  "hollowKeywords": [
+    "cabinet", "carcass", "drawer", "wardrobe", "casing", "shell", "housing",
+    "appliance", "washing machine", "fridge", "refrigerator", "oven", "dishwasher", "microwave"
+  ],
+
+  "brittleKeywords": [
+    "glass", "glazed", "glazing", "mirror", "mirrored", "crystal",
+    "ceramic", "porcelain", "tile", "tiled", "earthenware", "terracotta",
+    "marble", "granite", "quartz", "stone", "slate", "sandstone",
+    "plasterboard", "gypsum", "chalk"
+  ],
+
+  "deformableKeywords": [
+    "foam", "fabric", "textile", "cushion", "pillow", "sponge", "rubber", "cotton wool", "upholstery"
+  ],
+
+  "orientationKeywords": {
+    "fixed": ["motor", "engine", "compressor", "liquid", "fluid", "battery", "fuel", "refrigerant", "aquarium"],
+    "partial": ["appliance", "washing machine", "fridge", "refrigerator", "cooker", "oven", "dishwasher", "cabinet", "wardrobe"]
+  },
+
+  "defaultTier": "medium"
+}

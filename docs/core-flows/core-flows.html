@@ -1,0 +1,268 @@
+<style>
+  :root{
+    --ink:#1a2230; --muted:#5b6676; --line:#d9e0ea; --bg:#ffffff;
+    --blue:#2b5fb3; --blue-bg:#eef4ff;
+    --green:#1e8b53; --green-bg:#eafaf1;
+    --amber:#b9770f; --amber-bg:#fff6e9;
+    --purple:#6b3fa0; --purple-bg:#f3edfb;
+    --red:#c0392b; --red-bg:#fff5f5;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",-apple-system,Helvetica,Arial,sans-serif; font-size:12.5px; line-height:1.5; }
+  .page{ padding:38px 46px; max-width:940px; margin:0 auto; }
+  h1{ font-size:27px; margin:0 0 4px; letter-spacing:-0.4px; }
+  h2{ font-size:18px; margin:30px 0 4px; padding-bottom:6px; border-bottom:2px solid var(--line); }
+  h3{ font-size:14px; margin:20px 0 8px; }
+  p{ margin:7px 0; }
+  .lead{ color:var(--muted); font-size:13.5px; margin:2px 0 6px; }
+  .tag{ display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.4px;
+    padding:2px 9px; border-radius:20px; text-transform:uppercase; vertical-align:middle; }
+  .tag.blue{ background:var(--blue-bg); color:var(--blue); }
+  .tag.green{ background:var(--green-bg); color:var(--green); }
+  .tag.amber{ background:var(--amber-bg); color:var(--amber); }
+  .tag.purple{ background:var(--purple-bg); color:var(--purple); }
+  .band{ border-left:5px solid var(--line); padding:2px 0 2px 16px; margin:14px 0; }
+  .band.blue{ border-color:var(--blue); } .band.green{ border-color:var(--green); }
+  .band.amber{ border-color:var(--amber); } .band.purple{ border-color:var(--purple); }
+  .step{ margin:11px 0; padding-left:2px; }
+  .step .t{ font-weight:700; }
+  .step .n{ display:inline-block; min-width:22px; height:22px; line-height:22px; text-align:center;
+    border-radius:6px; font-size:11px; font-weight:700; margin-right:8px; color:#fff; }
+  .blue .n{ background:var(--blue); } .green .n{ background:var(--green); }
+  .amber .n{ background:var(--amber); } .purple .n{ background:var(--purple); }
+  .does{ margin:3px 0 3px 30px; }
+  .not{ margin:3px 0 3px 30px; font-size:11.8px; color:#7a2f27;
+    background:var(--red-bg); border:1px solid #f0cfc9; border-radius:6px; padding:5px 10px; }
+  .not b{ color:var(--red); }
+  .callout{ background:#f7f9fc; border:1px solid var(--line); border-radius:8px; padding:12px 16px; margin:14px 0; }
+  .callout.warn{ background:var(--red-bg); border-color:#f0cfc9; }
+  ul{ margin:6px 0 6px 0; padding-left:20px; } li{ margin:3px 0; }
+  .meta{ color:var(--muted); font-size:11px; }
+  .diagram-page{ text-align:center; }
+  .diagram-page img{ width:100%; max-width:920px; height:auto; }
+  .foot{ color:var(--muted); font-size:10.5px; margin-top:6px; }
+  @media print{
+    .page{ padding:26px 30px; }
+    h2{ page-break-after:avoid; } h3{ page-break-after:avoid; }
+    .step,.callout,.band{ page-break-inside:avoid; }
+    .pb{ page-break-before:always; }
+  }
+</style>
+
+<div class="page">
+
+<h1>FleetView — the core quote flows</h1>
+<p class="lead">A plain-language, micro-step map of the three job types the system actually handles today, with the scope boundary of every step made explicit.</p>
+<p class="meta">Every claim below was read from the running source code and independently re-checked against it. "Not included" lines describe what a step genuinely does <b>not</b> do — so nothing is assumed to exist that isn't built.</p>
+
+<div class="callout">
+<b>Does every job really start the same way?</b> Almost. The main front door accepts <b>one thing: a quote PDF</b> — no images, no spreadsheets, no manual typing. That single PDF is read and labelled once (Step 0), and only <i>then</i> does the operator choose one of three lanes. The one nuance: two of the lanes (multi-stop collection and groupage) can <i>also</i> be fed their own separate PDF, or in some cases typed input, instead of the Step 0 result. So the honest answer is: <b>a PDF is essentially always the first input, but not always the <i>same</i> Step 0 PDF.</b>
+</div>
+
+<!-- ══════════════════════ STEP 0 ══════════════════════ -->
+<h2><span class="tag blue">Step 0</span> &nbsp;Shared entry — every job starts here</h2>
+<p class="lead">Turns one uploaded PDF into a clean, structured result. No price, no route, and no job type are decided here.</p>
+
+<div class="band blue">
+<div class="step blue"><span class="n">1</span><span class="t">Receive the upload</span>
+<div class="does">The system takes the uploaded file over the web and reads its raw bytes.</div>
+<div class="not"><b>Not included:</b> no checking of any kind at this point — the front door is a thin hand-off; every safety check is deferred to the next step.</div></div>
+
+<div class="step blue"><span class="n">2</span><span class="t">Check the file is safe</span>
+<div class="does">Rejects an empty file, anything over the size limit (~25 MB), anything that isn't a PDF by type, and — for PDFs — sniffs the opening bytes to confirm it is genuinely a PDF and not a renamed something-else. Fails loudly with a clear error.</div>
+<div class="not"><b>Not included:</b> no virus/malware scan and no page-count limit. The "is it really this type" byte-check is wired for PDFs only.</div></div>
+
+<div class="step blue"><span class="n">3</span><span class="t">Read the pages</span>
+<div class="does">First reads the PDF's own embedded text layer (exact, free, instant). Only if a page comes back nearly empty (i.e. it's a scan/image) does it fall back to an OCR reader. Identical PDFs are remembered, so the same file is never read twice.</div>
+<div class="not"><b>Not included:</b> the OCR fallback needs an API key that is empty by default — so out of the box a <i>scanned</i> PDF fails until a key is configured. Only true text-based PDFs work with no setup.</div></div>
+
+<div class="step blue"><span class="n">4</span><span class="t">Build the cargo tables</span>
+<div class="does">Converts each page into a proper grid — header row plus item rows — that the rest of the system can work with. Marks the result "needs review" whenever it came from OCR rather than exact text.</div>
+<div class="not"><b>Not included:</b> only recognises real grid tables. If a PDF lays its numbers out as free text or loose columns, nothing is captured. It also doesn't yet interpret which column means what (that mapping happens later, inside packing).</div></div>
+
+<div class="step blue"><span class="n">5</span><span class="t">Archive the source (optional, off by default)</span>
+<div class="does">If storage is switched on, it quietly keeps a copy of the PDF and the structured result, keyed so a re-upload is recognised. Any failure here is swallowed so it can never block the quote.</div>
+<div class="not"><b>Not included:</b> does nothing at all unless storage is explicitly enabled — by default this step is a no-op.</div></div>
+
+<div class="step blue"><span class="n">6</span><span class="t">Tag each item fragile or standard</span>
+<div class="does">Reads each cargo row's text and matches it against keyword rules: exact phrases first, then "fragile" words (fragile wins ties, deliberately cautious), then "standard" words. Anything it can't decide is flagged low-confidence for a human to check. Records why each decision was made.</div>
+<div class="not"><b>Not included:</b> this is the <i>only</i> classification here. It does <b>not</b> work out durability, crush-strength, or which-way-up an item must travel — that is a separate step later, inside packing. It also extracts no dimensions, weights or quantities. Keyword matching only — no AI understanding of meaning.</div></div>
+
+<div class="step blue"><span class="n">7</span><span class="t">Find pickup &amp; delivery addresses</span>
+<div class="does">Scans the document for a pickup address and one or more delivery addresses using label + UK-postcode patterns. Degrades gracefully — a weak read never crashes the flow.</div>
+<div class="not"><b>Not included:</b> it <i>reads</i> addresses but does <b>not</b> confirm they exist or place them on a map (that happens later, only if needed). The optional smarter AI reader is off unless explicitly configured.</div></div>
+
+<div class="step blue"><span class="n">8</span><span class="t">Derive routing hints</span>
+<div class="does">A few gentle passes tag rows with a stop number if the sheet is a multi-drop manifest, guess collect-vs-deliver direction, and surface any hubs the sheet names for itself.</div>
+<div class="not"><b>Not included:</b> every hint is advisory — the operator can override all of them, and nothing here commits the job to a mode or saves anything permanently.</div></div>
+
+<div class="step blue"><span class="n">9</span><span class="t">Hand back one structured result</span>
+<div class="does">Returns a single tidy package: the tables, the fragile tags, the addresses, the hints — plus the thresholds the screen uses to <i>suggest</i> a job type. This is where the shared entry ends.</div>
+<div class="not"><b>Not included:</b> no job type is chosen by the system, and no packing, distance or price is produced. The suggestion is just that — the operator decides the lane.</div></div>
+</div>
+
+<div class="callout">↓ The operator now picks <b>one</b> of the three lanes below.</div>
+
+<!-- ══════════════════════ LANE A ══════════════════════ -->
+<h2 class="pb"><span class="tag green">Lane A</span> &nbsp;Point-to-point — one pickup → one drop, in our own vans</h2>
+<p class="lead">The default lane, used when the job has a single drop. Cargo is packed into fleet vans, one drive is measured, and a price is built. Selected automatically when the job carries no extra stops.</p>
+
+<div class="band green">
+<div class="step green"><span class="n">1</span><span class="t">Receive the cargo &amp; validate</span>
+<div class="does">Accepts the classified cargo (or, on an alternate entrance, a pre-made item list) and checks the shapes are sane — positive sizes, whole quantities.</div>
+<div class="not"><b>Not included:</b> no addresses and no pricing here — this stage is purely about the physical goods.</div></div>
+
+<div class="step green"><span class="n">2</span><span class="t">Assemble the load units</span>
+<div class="does">Turns each cargo row into a real 3-D item with dimensions, weight and handling facts (including the durability/which-way-up check that Step 0 deliberately skipped). Tables it can't size are surfaced as "skipped" or "please verify", never silently dropped.</div>
+<div class="not"><b>Not included:</b> it does not quietly ignore unreadable rows, and it assigns no delivery-stop order (there's only one drop).</div></div>
+
+<div class="step green"><span class="n">3</span><span class="t">Optional bulk consolidation</span>
+<div class="does">For very large orders, identical items collapse into palletised blocks and loose oddments get boxed together, so a huge list becomes a manageable number of placeable blocks. Real counts are restored afterwards, guarded so nothing can go missing.</div>
+<div class="not"><b>Not included:</b> off by default (items pass through untouched), and it never merges cargo across different jobs or customers — one order only.</div></div>
+
+<div class="step green"><span class="n">4</span><span class="t">Pack the cargo in 3-D &amp; rank the vans</span>
+<div class="does">Places each item inside a van's interior, trying allowed orientations and respecting a safe reach height, then tries every van type to answer "which vans could carry this, and how tightly".</div>
+<div class="not"><b>Not included:</b> no drop-order arrangement ("earliest drop nearest the doors") — that only exists in Lane B.</div></div>
+
+<div class="step green"><span class="n">5</span><span class="t">Pick the cheapest set of vans</span>
+<div class="does">Finds the lowest-cost <i>combination</i> of vans that carries the whole job, first flagging anything no van could ever take (too big/too heavy) with a plain reason, then minimising running cost (per-mile rate + a payload-adjusted fuel allowance). Ties prefer fewer, fuller vans.</div>
+<div class="not"><b>Not included:</b> overflow is reported as unplaced with reasons, never dropped. The choice is made on rate, not live trip distance (distance is applied afterwards). No sharing a van with another customer.</div></div>
+
+<div class="step green"><span class="n">6</span><span class="t">Independently re-check the plan is safe</span>
+<div class="does">Every produced van layout is re-validated from scratch (overlaps, bounds, support, reach height) using the same rules as the 3-D editor. A bad plan is rejected loudly, naming the rule that failed.</div>
+<div class="not"><b>Not included:</b> it only blocks a bad plan — it does not attempt to repair one, and it touches no pricing.</div></div>
+
+<div class="step green"><span class="n">7</span><span class="t">Measure the drive (one pickup → one drop)</span>
+<div class="does">Asks Google Maps for real driving distance and time for the single leg. With no map key it falls back to a straight-line estimate.</div>
+<div class="not"><b>Not included:</b> no intermediate stops, and the return journey home is <b>not</b> separately measured — it's handled as a multiplier in pricing.</div></div>
+
+<div class="step green"><span class="n">8</span><span class="t">Build the price</span>
+<div class="does">Bills every van over the route: distance cost = miles × a return factor (default ×2, a full round trip back to base empty) × the van's per-mile rate; plus a payload-adjusted fuel line; plus one driver's time (drive time + a fixed load/unload allowance); plus a per-fragile-item surcharge; plus a CO₂ figure. Session settings can override these; anything unset uses config.</div>
+<div class="not"><b>Not included:</b> the return leg is a flat ×2 of the outbound, not a separately-measured road home (asymmetric roads are deliberately ignored for fairness). No hub/cross-dock fee unless one is explicitly supplied. No cost-splitting across jobs — each van is billed the full route.</div></div>
+
+<div class="step green"><span class="n">9</span><span class="t">Save &amp; optionally email the quote</span>
+<div class="does">Appends the quote to history (with optional customer info) and, on a separate explicit action, renders and emails it.</div>
+<div class="not"><b>Not included:</b> emailing is never automatic — it's a deliberate second step.</div></div>
+</div>
+
+<div class="callout warn"><b>Lane A does not have:</b> multi-stop routing · a shared/groupage truck · a separately-measured return leg · drop-order load zoning · a default hub cross-dock. Van choice is optimised on rate + fuel, not on live trip distance.</div>
+
+<!-- ══════════════════════ LANE B ══════════════════════ -->
+<h2 class="pb"><span class="tag amber">Lane B</span> &nbsp;Multi-stop — one van, an ordered chain of stops</h2>
+<p class="lead">One van (or the packed fleet) drives a single ordered chain as one full-load job. Two shapes exist: <b>delivery</b> = one pickup + many drops; <b>collection</b> = one depot + many pickups. Both run the same engine, told apart by which rule-set is injected.</p>
+
+<div class="band amber">
+<div class="step amber"><span class="n">1</span><span class="t">Operator builds the ordered stop list</span>
+<div class="does">For delivery, the pickup plus the typed drop addresses (a pinned drop is forced to the end). For collection, a chosen hub plus a list of pickups (typed, or read from an uploaded pickup-manifest PDF).</div>
+<div class="not"><b>Not included:</b> no true mixed pickup-and-drop "milk run" — it's exactly 1 pickup + N drops, <i>or</i> hub + N pickups. Interleaving the two is deliberately out of scope.</div></div>
+
+<div class="step amber"><span class="n">2</span><span class="t">Validate the request</span>
+<div class="does">Rejects malformed input up front: every stop needs an address and a valid kind, the van list can't be empty, counts can't be negative; collection caps the pickups at 100.</div>
+<div class="not"><b>Not included:</b> addresses aren't confirmed real/mappable here, and the delivery entrance won't accept a "hub" stop at all.</div></div>
+
+<div class="step amber"><span class="n">3</span><span class="t">Stop-mix rule check (fail loud, but fixable)</span>
+<div class="does">Enforces the shape: delivery must start with the one pickup then 1…max drops; collection must start with the hub then only pickups. A violation throws a clear error naming the offending stop <i>and</i> the exact fix.</div>
+<div class="not"><b>Not included:</b> the engine itself is deliberately rule-agnostic — the "must start with a pickup" logic lives only in the swapped-in rule-set, not baked into the core.</div></div>
+
+<div class="step amber"><span class="n">4</span><span class="t">Route the whole chain in one call (one-way)</span>
+<div class="does">Builds the ordered waypoints (pickup → optional via-hub → drops → optional pinned final stop) and asks for the whole chain at once. Collection pins the hub again at the end so the van returns to depot. A zero-mile leg is a hard error, never a silent £0.</div>
+<div class="not"><b>Not included:</b> no return leg is billed for delivery (the return factor is forced to 1, not ×2 like Lane A).</div></div>
+
+<div class="step amber"><span class="n">5</span><span class="t">Distance via Google, or straight-line fallback</span>
+<div class="does">With a map key: real driving distance/time and an optional cheapest visiting order. With no key: a straight-line estimate that sums the legs and adds a loud "this is an estimate, the real quote will be higher" warning.</div>
+<div class="not"><b>Not included:</b> the straight-line fallback <b>cannot</b> re-order stops — it silently keeps the order as typed. Order optimisation is real only with Google Maps.</div></div>
+
+<div class="step amber"><span class="n">6</span><span class="t">Work out the visited order</span>
+<div class="does">Translates the routing engine's chosen order back to the operator's own stop numbering so the screen can show the path taken. Collection additionally proves every pickup appears exactly once, or it errors.</div>
+<div class="not"><b>Not included:</b> the delivery side does <b>not</b> run that exactly-once safety check — only collection does.</div></div>
+
+<div class="step amber"><span class="n">7</span><span class="t">Price the trip (reuses Lane A's engine)</span>
+<div class="does">Uses the <i>same</i> pricing calculator as point-to-point — distance + driver time + fragile surcharge — but with an extra per-stop handling allowance multiplied by the number of stops. Delivery reuses the already-packed fleet; collection prices one empty van.</div>
+<div class="not"><b>Not included:</b> there is no separate bespoke multi-stop pricer — it's Lane A's calculator with a return factor of 1 and inflated handling minutes. Collection carries no packed cargo, so no fuel line.</div></div>
+
+<div class="step amber"><span class="n">8</span><span class="t">Add hub fees &amp; advisory flags</span>
+<div class="does">Delivery: if routed via a hub, adds a flat cross-dock handling fee. Collection: marks each pickup in- or out-of the chosen hub's catchment and warns on any that fall outside.</div>
+<div class="not"><b>Not included:</b> catchment flags are advisory surfaces, never gates — an out-of-area or unreadable pickup is flagged, never removed from the run.</div></div>
+
+<div class="step amber"><span class="n">9</span><span class="t">Return the quote</span>
+<div class="does">Delivery returns the quote + warnings + visiting order and saves it to history. Collection returns the hub, the ordered pickups with verdicts, and the quote, and can show per-stop 3-D pallet cards by regrouping the existing packing.</div>
+<div class="not"><b>Not included:</b> collection quotes are <b>not</b> written to history (only delivery saves). The per-stop cards do no new packing — they only regroup what the packer already produced.</div></div>
+</div>
+
+<div class="callout warn"><b>Lane B does not have:</b> a mixed pickup-and-drop milk run · any re-packing per stop (it reuses the fleet packed in Lane A) · order optimisation without a Google key · an up-front address-validity check. One planning helper for splitting the load by drop-order exists in the code but is <b>not wired to anything</b> — unused scaffolding, not part of the running flow.</div>
+
+<!-- ══════════════════════ LANE C ══════════════════════ -->
+<h2 class="pb"><span class="tag purple">Lane C</span> &nbsp;Groupage — many companies share the same trucks, via hubs</h2>
+<p class="lead">Several companies' part-loads are read off one shared manifest, matched to regional hubs, grouped onto shared trucks by pallet-space and weight, priced from a rate card, then booked and tracked through delivery. Selected by using the groupage screens/endpoints rather than the standard packer.</p>
+
+<div class="band purple">
+<div class="step purple"><span class="n">1</span><span class="t">Hub network is set up (prerequisite)</span>
+<div class="does">Loads the regional network — 11 UK hubs, each owning a distinct set of postcode areas. Operators can add/edit/delete hubs (validated, and the areas must not overlap), or extract <i>candidate</i> hubs from a depot-list PDF.</div>
+<div class="not"><b>Not included:</b> no spreadsheet import; the depot-PDF path only <i>suggests</i> hubs and never auto-writes the network. Catchment is exact postcode-area match — no fuzzy/geographic fallback.</div></div>
+
+<div class="step purple"><span class="n">2</span><span class="t">Read the manifest into a roster of draft consignments</span>
+<div class="does">Turns one shared manifest into a list of companies, each with an origin, a destination and pallet lines. It can read a freshly-dropped PDF or reuse a document already read earlier in the flow (no re-reading). An unreadable document comes back as an empty list, never a crash.</div>
+<div class="not"><b>Not included:</b> leaner than the main packer — no fragility tagging, no address detection. Nothing is saved yet; the roster is returned for the operator to confirm.</div></div>
+
+<div class="step purple"><span class="n">3</span><span class="t">Parse the collection-run table offline</span>
+<div class="does">The default reader parses the manifest's labelled grid (one row per company: name, address, pallet <i>count</i>, pallet size) with plain rules — no AI, no network — so a dead API key can't break it. It reads the authoritative pallet-count column and classifies each footprint (full/half/quarter/oversize). Reads across page breaks.</div>
+<div class="not"><b>Not included:</b> a freeform manifest with no such table returns empty unless an optional AI fallback is configured. It never invents a company, and deliberately ignores the per-piece carton counts (avoiding a "10,000-carton" trap).</div></div>
+
+<div class="step purple"><span class="n">4</span><span class="t">Read (or calculate) per-pallet weight — never estimate</span>
+<div class="does">Resolves weight in strict priority: (1) a dedicated weight column → taken as-is; else (2) calculated from the cargo-summary totals matched to the company, split across its pallets; else (3) left blank and flagged for the operator. An implausibly heavy calculated pallet is <i>kept but flagged</i> — never dropped or blocked.</div>
+<div class="not"><b>Not included:</b> no density/volume guessing. If the manifest states no weight anywhere, weight stays blank and is surfaced, never invented. The document's own totals are trusted.</div></div>
+
+<div class="step purple"><span class="n">5</span><span class="t">Collapse hub double-counting to one trunk load</span>
+<div class="does">When a manifest describes collect → hub → trunk → deliver, the same pallets legitimately appear on both legs (≈ double). This step detects that pattern — and only when the two legs' pallet totals match — and collapses it to one consolidated trunk load carrying the pallets once.</div>
+<div class="not"><b>Not included:</b> fail-safe — if the two legs don't match, it does <b>not</b> pick one; it leaves the roster unchanged. It won't guess the two hub postcodes if they're unreadable.</div></div>
+
+<div class="step purple"><span class="n">6</span><span class="t">Overlay the manifest's own hubs for this session</span>
+<div class="does">Reads the hubs the document names for itself and layers them over the saved network for this request only, widening the collection hub's catchment to cover everywhere the run actually collects from — so out-of-area companies don't fall off the shared truck.</div>
+<div class="not"><b>Not included:</b> a hub with no readable postcode is skipped, not guessed. These session hubs are never written to the permanent network.</div></div>
+
+<div class="step purple"><span class="n">7</span><span class="t">Quote one consignment (hubs → demand → path → capacity → price)</span>
+<div class="does">For a single consignment: resolve its end hubs, total its pallet-spaces and weight, build the door-to-door path (collect → trunk → deliver, or collect → deliver locally), check every leg against capacity, then price from a flat rate card: pallet-spaces × a per-space rate + first/last-mile surcharges + a heavy-pallet surcharge.</div>
+<div class="not"><b>Not included:</b> <b>no mileage and no 3-D volume in the price</b> — it's a flat per-pallet-space lookup. The trunk is a single hop only (multi-hop is deferred). Delivery time is echoed from the input, never computed.</div></div>
+
+<div class="step purple"><span class="n">8</span><span class="t">Capacity — a configurable ceiling</span>
+<div class="does">Two ceilings. The per-pallet weight ceiling is <i>soft</i> (off by default): the document's stated tonnage is trusted and priced, overflow surfaced not blocked. The per-truck-leg capacity (pallet-spaces <i>and</i> weight) is checked, and on the single-quote and booking paths it <i>does</i> hard-stop — but the error names the leg, the exact overflow, and how many vehicles the load actually needs. Every limit is a config value, editable without code.</div>
+<div class="not"><b>Not included / important nuance:</b> the "capacity should never be a hard reject" principle is only <b>partly</b> honoured — the single-quote and booking checks <i>do</i> hard-stop on an over-capacity leg. The flexible "auto-split instead of reject" behaviour lives only in the shared-truck planner (next step). Capacity is per-vehicle, not a live per-date balance.</div></div>
+
+<div class="step purple"><span class="n">9</span><span class="t">Group loads onto shared trucks + 3-D plan</span>
+<div class="does">Groups consignments that share a leg onto the same truck. An over-capacity group is <b>auto-split</b> across the fewest feasible trucks (bin-packing on both space and weight), keeping each company's pallets together. Each truck's real geometry is loaded and pallets are auto-packed into an adjustable 3-D layout.</div>
+<div class="not"><b>Not included:</b> here it never hard-rejects — a single load too big for any one truck stays on its own truck, <i>flagged</i>, never dropped. Grouping is quote-level only (not saved).</div></div>
+
+<div class="step purple"><span class="n">10</span><span class="t">Book it (server re-quote + anti-drift)</span>
+<div class="does">On booking, the server re-prices from the same inputs (never trusts a price sent from the screen); if the total has drifted by even a penny it refuses and reports the change. On agreement it creates a booked shipment and, in one locked step, re-checks capacity across this booking <i>plus</i> every other active shipment — catching two bookings that each fit alone but overflow the shared truck together.</div>
+<div class="not"><b>Not included:</b> only hub-routed quotes can be booked — a direct (hubless) quote is quotable but not bookable. There's no dated reservation/hold ledger — booking records a shipment, it doesn't reserve a date's capacity.</div></div>
+
+<div class="step purple"><span class="n">11</span><span class="t">Track the shipment through its lifecycle</span>
+<div class="does">Each shipment walks a guarded set of stages — booked → collected → at origin depot → in transit → at destination hub → out for delivery → complete — plus exception branches (roll to next truck, failed delivery + limited re-attempts, return to sender, cancel-before-collect). Illegal jumps are refused; every step is logged; writes are serialised so simultaneous updates can't clash.</div>
+<div class="not"><b>Not included:</b> no physical barcode/scanner hardware — a "scan" is a status update via the system. Dated capacity holds are deferred.</div></div>
+
+<div class="step purple"><span class="n">12</span><span class="t">Per-leg load view &amp; on-demand hub distance</span>
+<div class="does">A read-only view shows every active shipment grouped by the leg it travels, with space/weight used against each leg's capacity (e.g. "18/26 spaces"). Separately, a real road-distance lookup to a hub is available on explicit request (e.g. from a dragged map pin).</div>
+<div class="not"><b>Not included:</b> the load view enforces nothing (capacity is enforced at booking). The nearest-hub straight-line helper is a map suggestion only — it is <b>not</b> the routing rule, which is exact catchment match.</div></div>
+</div>
+
+<div class="callout warn"><b>Lane C does not have:</b> any spreadsheet import · a dated timetable / capacity-hold ledger · multi-hop trunking (single hop only) · any mileage or 3-D-volume component in the price (flat rate card; the configured zone-rate map is currently empty, so every lane prices at the flat default). Only hub-routed quotes are bookable. Records live in flat JSON files, not a real database.</div>
+
+<!-- ══════════════════════ CROSS-CUTTING ══════════════════════ -->
+<h2 class="pb">Truths that hold across all three lanes</h2>
+<ul>
+<li><b>One front door, three exits.</b> Step 0 is identical for everyone; the lanes diverge only <i>after</i> the PDF is read and the operator chooses.</li>
+<li><b>The system suggests, the operator decides.</b> The job type is never forced by the software — Step 0 only ships thresholds that <i>recommend</i> a lane.</li>
+<li><b>"Never guess" is enforced, not aspirational.</b> Low-confidence classifications, unreadable tables, out-of-area pickups and doubtful weights are all <i>flagged and surfaced</i>, never silently dropped or invented.</li>
+<li><b>Default engines are the offline "rule" ones.</b> Fragility, address reading and the groupage manifest reader all default to plain rule-based logic with no external API — so a missing/expired key degrades quality, it doesn't take the system down.</li>
+<li><b>Pricing differs fundamentally by lane.</b> Lanes A and B price on <i>distance</i> (per-mile van rates); Lane C prices on <i>pallet-space</i> (a flat rate card, no mileage). They are not the same money model.</li>
+<li><b>Persistence is lightweight.</b> Quotes, hubs and shipments are stored in flat JSON files behind a single write-queue — correct for one running instance, not a multi-server database.</li>
+</ul>
+
+<h2 class="pb">The whole picture on one page</h2>
+<div class="diagram-page">
+<img src="core-flows.svg" alt="Core quote flows diagram">
+<p class="foot">Diagram source: <code>core-flows.d2</code> — regenerate with <code>d2 --layout elk --theme 0 --pad 40 core-flows.d2 core-flows.svg</code>. Every box maps to a step above; red dashed boxes list what each lane deliberately does <b>not</b> do.</p>
+</div>
+
+</div>

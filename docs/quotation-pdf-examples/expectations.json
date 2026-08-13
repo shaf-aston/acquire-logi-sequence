@@ -1,0 +1,192 @@
+{
+  "01-point-to-point/drops/multi-drop-large.pdf": {
+    "mode": "multi",
+    "items": 13,
+    "totalKg": 7037,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/drops/multi-drop.pdf": {
+    "mode": "multi",
+    "items": 8,
+    "totalKg": 9576,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/drops/single-drop.pdf": {
+    "mode": "single",
+    "items": 4,
+    "totalKg": 2565,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/inventory-classification-key/apex-retail_full.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 2565,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/inventory-classification-key/apex-retail_inventory-only.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 2565,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/inventory-classification-key/northstar-industrial_full.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 5515,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/inventory-classification-key/northstar-industrial_inventory-only.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 5515,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/inventory-classification-key/titan-industrial_full.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 7882,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/inventory-classification-key/titan-industrial_inventory-only.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 7882,
+    "maxUnplaced": 0
+  },
+  "01-point-to-point/special-haul/abnormal-indivisible-load.pdf": {
+    "mode": "single",
+    "items": 5,
+    "totalKg": 9972,
+    "maxUnplaced": 1
+  },
+  "01-point-to-point/special-haul/long-haul-domestic.pdf": {
+    "mode": "multi",
+    "items": 9,
+    "totalKg": 27727,
+    "maxUnplaced": 0
+  },
+  "02-groupage/capacity-edge-cases/high-volume.pdf": {
+    "mode": "groupage",
+    "companies": 4,
+    "pallets": 45,
+    "totalKg": 96960,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/capacity-edge-cases/oversized.pdf": {
+    "mode": "groupage",
+    "companies": 3,
+    "pallets": 4,
+    "totalKg": 1455,
+    "maxUnplaced": 0,
+    "requireAllWeights": false
+  },
+  "02-groupage/hub-and-trunk/large-multi-hub.pdf": {
+    "mode": "groupage",
+    "companies": 5,
+    "pallets": 20,
+    "totalKg": 53570,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/hub-and-trunk/multi-company-no-stops.pdf": {
+    "mode": "groupage",
+    "companies": 3,
+    "pallets": 9,
+    "totalKg": 7170,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/hub-and-trunk/multi-company.pdf": {
+    "mode": "groupage",
+    "companies": 4,
+    "pallets": 12,
+    "totalKg": 7460,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/intermediate-trunk-stops/high-volume-two-stops.pdf": {
+    "mode": "groupage",
+    "companies": 2,
+    "pallets": 24,
+    "totalKg": 19500,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/intermediate-trunk-stops/stops-single-company.pdf": {
+    "mode": "groupage",
+    "companies": 3,
+    "pallets": 9,
+    "totalKg": 3340,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/milk-run/milk-run-large.pdf": {
+    "mode": "groupage",
+    "companies": 8,
+    "pallets": 21,
+    "totalKg": 99242,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/milk-run/milk-run.pdf": {
+    "mode": "groupage",
+    "companies": 6,
+    "pallets": 15,
+    "totalKg": 13807,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/single-hub-no-trunk/one-company.pdf": {
+    "mode": "groupage",
+    "companies": 3,
+    "pallets": 4,
+    "totalKg": 1430,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "02-groupage/single-hub-no-trunk/small-single-hub.pdf": {
+    "mode": "groupage",
+    "companies": 3,
+    "pallets": 4,
+    "totalKg": 1792,
+    "maxUnplaced": 0,
+    "requireAllWeights": true
+  },
+  "03-manifest-variants/multi-drop/detailed.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 35910,
+    "maxUnplaced": 0
+  },
+  "03-manifest-variants/multi-drop/simplified.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 35910,
+    "maxUnplaced": 0
+  },
+  "03-manifest-variants/route-plan/detailed.pdf": {
+    "mode": null,
+    "items": 20,
+    "totalKg": 2565,
+    "maxUnplaced": 0
+  },
+  "03-manifest-variants/route-plan/simplified.pdf": {
+    "mode": null,
+    "items": 0,
+    "totalKg": 0,
+    "maxUnplaced": 0
+  },
+  "03-manifest-variants/single-drop/detailed.pdf": {
+    "mode": "multi",
+    "items": 20,
+    "totalKg": 35910,
+    "maxUnplaced": 0
+  },
+  "03-manifest-variants/single-drop/simplified.pdf": {
+    "mode": "single",
+    "items": 13,
+    "totalKg": 21735,
+    "maxUnplaced": 0
+  }
+}

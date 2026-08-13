@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "enabled": true,
+  "minUnitsToConsolidate": 50,
+  "maxBlockUnits": 500,
+  "minSplitFraction": 0.25,
+  "footprintCapM": 1.2,
+  "heightCapM": 2.0,
+  "_boxNote": "Mixed-item box consolidation (standard-box.ts): a DIVERSE huge order (many different small items, none identical enough to group) gets its loose small units binned single-layer onto shared standard boxes (mixed pallets), so each box is one placeable object holding many real units — otherwise the diverse units blow maxPackableBlocks. footprintM defaults to a full UK pallet for maximum reduction; set it smaller (e.g. 0.6 x 0.5, a quarter-pallet carton) for finer boxes. maxHeightM bounds what counts as a 'small' boxable item. Boxes stack per the normal crush validator; fragile items box separately and advertise a zero top load.",
+  "box": {
+    "enabled": true,
+    "footprintM": { "l": 1.2, "w": 1.0 },
+    "maxHeightM": 1.2,
+    "maxBoxWeightKg": 500,
+    "fillFraction": 0.85,
+    "minUnitsToBox": 100
+  }
+}

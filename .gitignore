@@ -1,0 +1,25 @@
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets — never commit. Allow-list, not deny-list: `.env.production` / `.env.test` and any
+# future variant are covered without anyone remembering to add a line.
+.env*
+!.env.example
+
+# Scratch
+uploads/
+*.log
+
+# OCR result cache (content-hashed; safe to delete, regenerates on next ingest)
+.ocr-cache/
+
+# Tesseract language model (~5MB; auto-downloaded on first OCR run, never commit)
+eng.traineddata
+*.traineddata
+
+# Local debug scratch (throwaway)
+.scratch-debug/

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "deny": [
+      "Git *",
+      "Git branch*",
+      "Git merge*",
+      "Git rebase*",
+      "Git log*",
+      "Git show*"
+    ]
+  }
+}

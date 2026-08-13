@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "footprintUnits": {
+    "full": 1,
+    "half": 0.5,
+    "quarter": 0.25,
+    "oversize": 2
+  },
+  "legCapacity": {
+    "collect": { "palletSpaces": 10, "maxPayloadKg": 3500, "vehicleId": "luton-tail-lift" },
+    "trunk": { "palletSpaces": 26, "maxPayloadKg": 24000, "vehicleId": "curtainsider-truck" },
+    "deliver": { "palletSpaces": 10, "maxPayloadKg": 3500, "vehicleId": "luton-tail-lift" }
+  },
+  "ratePerFootprint": {
+    "default": 45,
+    "zones": {}
+  },
+  "firstMileSurcharge": 25,
+  "lastMileSurcharge": 25,
+  "perTrunkStopFee": 0,
+  "heavyPallet": {
+    "thresholdKgPerFootprint": 700,
+    "surchargePerPallet": 40
+  },
+  "maxPalletWeightKg": 1500,
+  "enforcePerPalletCeiling": false,
+  "enforceLegCapacity": false,
+  "chargeableSpaceBasis": "weight-adjusted",
+  "_maxPlausibleDerivedPalletKgNote": "Sanity ceiling (kg) for a per-pallet weight CALCULATED from a GROUPAGE cargo summary (total / pallet count — collection-run-parser.ts). Above this the derived figure is KEPT but flagged doubtful for the operator to confirm, never blocked and never discarded. NOT the same knob as config/column-map.json's palletDefaults.plausibleMinKg/plausibleMaxKg (item-assembler.ts): that one guards a per-pallet weight derived from a single manifest's own PROSE total ('Total: 266 pallets | 35,910 kg'), and an out-of-band figure there is DISCARDED entirely in favour of a config default, not kept and flagged. Same shape of guard, different source data, different failure mode -- do not merge them into one value.",
+  "maxPlausibleDerivedPalletKg": 2500
+}

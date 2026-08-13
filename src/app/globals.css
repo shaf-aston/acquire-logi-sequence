@@ -1,0 +1,286 @@
+:root {
+  /* Surface */
+  --color-page-bg:         #F4F5F7;
+  --color-surface:         #FFFFFF;
+  --color-surface-sub:     #F9FAFB;
+  --color-surface-hover:   #F3F4F6;
+
+  /* Borders */
+  --color-border:          #E8EAED;
+  --color-border-strong:   #D1D5DB;
+
+  /* Text */
+  --color-header-bg:       #FFFFFF;
+  --color-text:            #1C1E29;
+  --color-text-sub:        #374151;
+  --color-muted:           #6B7280;
+
+  /* Accent (interactive blue) */
+  --color-accent:          #3B82F6;
+  --color-accent-dark:     #2563EB;
+  --color-accent-muted:    #EFF6FF;
+  --color-accent-border:   #BFDBFE;
+  --color-on-accent:       #FFFFFF;
+
+  /* Fragility states */
+  --color-fragile-bg:      #FEE2E2;
+  --color-fragile-fg:      #991B1B;
+  --color-fragile-border:  #FECACA;
+  --color-standard-bg:     #D1FAE5;
+  --color-standard-fg:     #065F46;
+  --color-standard-border: #A7F3D0;
+  --color-review-bg:       #FEF3C7;
+  --color-review-fg:       #92400E;
+  --color-review-border:   #FDE68A;
+
+  /* Overload (crush limit exceeded) — orange, kept distinct from fragile-red and
+     review-amber so an overloaded box reads as its own alarm state, even when the
+     box is also fragile. `fill`/`edge` are the solid 3D-mesh colours. */
+  --color-overload-bg:     #FFE1CC;   /* deeper peach-orange — clearly out of the review-amber band */
+  --color-overload-fg:     #9A3412;
+  --color-overload-border: #FDBA74;
+  --color-overload-fill:   #F97316;
+  --color-overload-edge:   #C2410C;
+
+  /* Success */
+  --color-success:         #22C55E;
+
+  /* Error */
+  --color-error:           #DC2626;
+  --color-error-bg:        #FEF2F2;
+  --color-error-border:    #FECACA;
+
+  /* Flagged (manual override — the operator forced a placement the validator rejected).
+     Amber, kept clear of the overload-orange and error-red alarms so a hand-overridden
+     box reads as "check this — not counted yet", not a computed failure. `fill`/`edge`
+     are the solid 3D-mesh colours; -bg/-border dress the "N flagged" banner. */
+  --color-warning:         #B45309;
+  --color-warning-bg:      #FEF3C7;
+  --color-warning-border:  #FCD34D;
+  --color-flagged-fill:    #F59E0B;
+  --color-flagged-edge:    #B45309;
+
+  /* Status indicator dots */
+  --color-status-idle:       #D1D5DB;
+  --color-status-processing: #F59E0B;
+  --color-status-done:       #10B981;
+
+  /* Map pins (Depots & hubs finder) — a hub / the nearest hub / the point being
+     checked. Google's map tiles stay light regardless of app theme, so these are
+     intentionally NOT redefined in the dark blocks below; the pins must stay legible
+     against that light tile background either way. */
+  --color-map-hub:      #D64545;
+  --color-map-nearest:  #2F9E44;
+  --color-map-locator:  #1971C2;
+
+  /* Company palette — the shared-truck load plan tints each pallet by its owning company so
+     the person stacking the truck can tell whose is whose at a glance. Eight distinct hues,
+     kept clear of the fragile-red / overload-orange alarm colours (those still override a box
+     fill). Cycled when more than eight companies share a truck. */
+  --color-company-1: #6366F1;
+  --color-company-2: #0EA5E9;
+  --color-company-3: #14B8A6;
+  --color-company-4: #A855F7;
+  --color-company-5: #D97706;
+  --color-company-6: #DB2777;
+  --color-company-7: #65A30D;
+  --color-company-8: #475569;
+
+  /* Shadows */
+  --shadow-card:       0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.05);
+
+  /* Floating-control shadows — smaller/tighter than the card shadows above, used by
+     toolbars, tooltips and drag-lifted items in the 3D scene UI. Kept as their own
+     tokens (not reusing --shadow-card) because they're a visibly different depth. */
+  --shadow-float:        0 2px 8px rgba(0,0,0,0.18);
+  --shadow-float-soft:   0 1px 4px rgba(0,0,0,0.15);
+  --shadow-float-strong: 0 1px 4px rgba(0,0,0,0.30);
+  --shadow-drag:         0 8px 20px rgba(0,0,0,0.16);
+}
+
+/* Dark theme — redefines the SAME custom-property names, so every component that
+   reads a token flips automatically with zero component changes. Two triggers:
+   the OS/browser preference (unless the user has explicitly forced light via
+   data-theme="light"), and an explicit data-theme="dark" toggle that wins either way.
+   The company palette and 3D fill/edge colours are intentionally left as-is — they're
+   vivid enough to read on a dark surface and must stay stable across themes. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Neutrals carry a warm amber/orange tint (hue ~30) instead of a cold blue-grey,
+       per the requested "more orange" dark mode. Accent stays blue and the semantic
+       state colours (error/warning/overload) stay as designed below — only the
+       page/surface/border/text neutrals shifted. */
+    --color-page-bg:         #15110D;
+    --color-surface:         #221B14;
+    --color-surface-sub:     #2B2118;
+    --color-surface-hover:   #362A1E;
+
+    --color-border:          #3D3021;
+    --color-border-strong:   #4F3F2B;
+
+    --color-header-bg:       #221B14;
+    --color-text:            #F5EFE7;
+    --color-text-sub:        #D9CCBC;
+    --color-muted:           #A8927A;
+
+    --color-accent:          #3B82F6;
+    --color-accent-dark:     #60A5FA;
+    --color-accent-muted:    #1E293B;
+    --color-accent-border:   #1E40AF;
+
+    --color-fragile-bg:      #3B1D1D;
+    --color-fragile-fg:      #FCA5A5;
+    --color-fragile-border:  #7F1D1D;
+    --color-standard-bg:     #10291F;
+    --color-standard-fg:     #6EE7B7;
+    --color-standard-border: #065F46;
+    --color-review-bg:       #322610;
+    --color-review-fg:       #FCD34D;
+    --color-review-border:   #92400E;
+
+    --color-overload-bg:     #3A2416;
+    --color-overload-fg:     #FDBA74;
+    --color-overload-border: #9A3412;
+
+    --color-error:           #F87171;
+    --color-error-bg:        #2A1515;
+    --color-error-border:    #7F1D1D;
+
+    --color-warning:         #FBBF24;
+    --color-warning-bg:      #322610;
+    --color-warning-border:  #92400E;
+
+    --shadow-card:       0 1px 4px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.04);
+    --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
+
+    /* Stronger than the light-mode floats — a near-black shadow reads faintly
+       against an already-dark surface, so opacity is raised to keep the same
+       perceived elevation. */
+    --shadow-float:        0 2px 8px rgba(0,0,0,0.45);
+    --shadow-float-soft:   0 1px 4px rgba(0,0,0,0.35);
+    --shadow-float-strong: 0 1px 4px rgba(0,0,0,0.55);
+    --shadow-drag:         0 8px 20px rgba(0,0,0,0.40);
+  }
+}
+:root[data-theme="dark"] {
+  /* Kept identical to the @media block above — this is the explicit-toggle mirror. */
+  --color-page-bg:         #15110D;
+  --color-surface:         #221B14;
+  --color-surface-sub:     #2B2118;
+  --color-surface-hover:   #362A1E;
+
+  --color-border:          #3D3021;
+  --color-border-strong:   #4F3F2B;
+
+  --color-header-bg:       #221B14;
+  --color-text:            #F5EFE7;
+  --color-text-sub:        #D9CCBC;
+  --color-muted:           #A8927A;
+
+  --color-accent:          #3B82F6;
+  --color-accent-dark:     #60A5FA;
+  --color-accent-muted:    #1E293B;
+  --color-accent-border:   #1E40AF;
+
+  --color-fragile-bg:      #3B1D1D;
+  --color-fragile-fg:      #FCA5A5;
+  --color-fragile-border:  #7F1D1D;
+  --color-standard-bg:     #10291F;
+  --color-standard-fg:     #6EE7B7;
+  --color-standard-border: #065F46;
+  --color-review-bg:       #322610;
+  --color-review-fg:       #FCD34D;
+  --color-review-border:   #92400E;
+
+  --color-overload-bg:     #3A2416;
+  --color-overload-fg:     #FDBA74;
+  --color-overload-border: #9A3412;
+
+  --color-error:           #F87171;
+  --color-error-bg:        #2A1515;
+  --color-error-border:    #7F1D1D;
+
+  --color-warning:         #FBBF24;
+  --color-warning-bg:      #322610;
+  --color-warning-border:  #92400E;
+
+  --shadow-card:       0 1px 4px rgba(0,0,0,0.40), 0 0 0 1px rgba(255,255,255,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06);
+
+  --shadow-float:        0 2px 8px rgba(0,0,0,0.45);
+  --shadow-float-soft:   0 1px 4px rgba(0,0,0,0.35);
+  --shadow-float-strong: 0 1px 4px rgba(0,0,0,0.55);
+  --shadow-drag:         0 8px 20px rgba(0,0,0,0.40);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0%   { opacity: 0.5; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Date "scheduler" field — the native control styled to match the design system:
+   a tinted, clickable calendar icon and a clear accent focus ring. */
+.date-field {
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.date-field:hover {
+  border-color: var(--color-border-strong);
+}
+.date-field:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-muted);
+}
+.date-field::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 2px;
+  border-radius: 4px;
+  transition: opacity 0.12s ease, background 0.12s ease;
+}
+.date-field::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background: var(--color-accent-muted);
+}
+
+/* Responsive layout — only breakpoint rules, no design overrides */
+.page-grid {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Shared-truck "gather consignments" inputs: document-read is the primary action and takes all the
+   remaining width (1fr); recent-quotes is a fixed "small part" sidebar — bounded 240–300px so it
+   stays tidy for the compact quote cards and never balloons on a wide screen.
+   Stretched (not "start") so the shorter document-read card grows to match the recent-quotes
+   card's height instead of leaving it visibly shorter next to a long quote list. */
+.groupage-input-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
+  gap: 12px;
+  align-items: stretch;
+}
+
+@media (max-width: 768px) {
+  .page-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .groupage-input-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-sticky {
+    position: static !important;
+  }
+}
