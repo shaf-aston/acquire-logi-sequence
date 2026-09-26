@@ -23,3 +23,6 @@ eng.traineddata
 
 # Local debug scratch (throwaway)
 .scratch-debug/
+
+# Claude Code session lock
+.claude/scheduled_tasks.lock
