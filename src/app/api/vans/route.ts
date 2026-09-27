@@ -6,6 +6,7 @@ import { NextResponse } from "next/server";
 import { getConfig } from "@/config/env";
 import { FileVanRepository, VanConfigError } from "@/lib/packing/van.repository";
 import type { Van } from "@/lib/packing/packing.types";
+import { requireAdmin } from "@/lib/security/admin-auth";
 
 export const runtime = "nodejs";
 
@@ -103,6 +104,8 @@ export async function GET(): Promise<Response> {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const denied = requireAdmin(request);
+  if (denied) return denied;
   try {
     const van = parseVan(await request.json());
     await repo.upsertVan(van);
@@ -118,6 +121,8 @@ export async function PUT(request: Request): Promise<Response> {
 }
 
 export async function DELETE(request: Request): Promise<Response> {
+  const denied = requireAdmin(request);
+  if (denied) return denied;
   try {
     const body = (await request.json()) as { id?: unknown };
     const id = typeof body?.id === "string" ? body.id.trim() : "";
