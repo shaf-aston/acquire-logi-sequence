@@ -1,7 +1,7 @@
 /**
  * Resolves the active EmailSender from config:
- *   • EMAIL_SMTP_PASS absent → UnconfiguredEmailSender (fails loud on send)
- *   • EMAIL_SMTP_PASS set   → SmtpEmailSender (Gmail App Password by default)
+ *   • EMAIL_FROM_ADDRESS, EMAIL_SMTP_USER or EMAIL_SMTP_PASS absent → UnconfiguredEmailSender (fails loud on send)
+ *   • all set → SmtpEmailSender (Gmail App Password by default)
  * Resolved once and cached, mirroring src/lib/storage/store.factory.ts.
  */
 import { getConfig } from "@/config/env";
@@ -17,9 +17,16 @@ export function getEmailSender(): EmailSender {
   if (cached) return cached;
 
   const e = getConfig().email;
-  if (e.smtp.pass === "") {
-    logger.warn("EMAIL_SMTP_PASS not set — Send Quote will fail loud until it's configured");
-    cached = new UnconfiguredEmailSender();
+  const missing = ([
+    ["EMAIL_FROM_ADDRESS", e.fromAddress],
+    ["EMAIL_SMTP_USER", e.smtp.user],
+    ["EMAIL_SMTP_PASS", e.smtp.pass],
+  ] as const)
+    .filter(([, value]) => value === "")
+    .map(([name]) => name);
+  if (missing.length > 0) {
+    logger.warn("email not fully configured — Send Quote will fail loud until it is", { missing });
+    cached = new UnconfiguredEmailSender(missing);
     return cached;
   }
 
