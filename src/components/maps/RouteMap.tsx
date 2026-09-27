@@ -181,7 +181,6 @@ export function RouteMap({
     : "";
   useEffect(() => {
     if (geocode) setGeoSettled(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [geocode, geoKeyForReset]);
 
   // No key, or Google rejected the key mid-session → fail LOUD with a clear reason, never a silent
