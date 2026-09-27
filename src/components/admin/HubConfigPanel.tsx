@@ -9,6 +9,7 @@ import { extractPostcode } from "@/lib/geo/address-resolver";
 import { HubNetworkMap } from "./HubNetworkMap";
 import { HubMap } from "./HubMap";
 import { PlacesInput } from "@/components/PlacesInput";
+import { adminFetch } from "@/lib/security/admin-fetch";
 
 interface Draft {
   id: string;
@@ -120,7 +121,7 @@ export function HubConfigPanel({
       if (currentOwner) {
         const withoutArea = currentOwner.catchment.filter((a) => a !== area);
         // Carry address through — upsert replaces the whole hub, so omitting it would wipe it.
-        await fetch("/api/hubs", {
+        await adminFetch("/api/hubs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: currentOwner.id, name: currentOwner.name, catchment: withoutArea, address: currentOwner.address }),
@@ -128,7 +129,7 @@ export function HubConfigPanel({
       }
       const gainingHub = hubs.find((h) => h.id === nearestId);
       if (!gainingHub) return;
-      const res = await fetch("/api/hubs", {
+      const res = await adminFetch("/api/hubs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: gainingHub.id, name: gainingHub.name, catchment: [...gainingHub.catchment, area], address: gainingHub.address }),
@@ -208,7 +209,7 @@ export function HubConfigPanel({
       return;
     }
     try {
-      const res = await fetch("/api/hubs", {
+      const res = await adminFetch("/api/hubs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: cand.id, name: cand.name.trim(), catchment }),
@@ -276,7 +277,7 @@ export function HubConfigPanel({
     const id = isEditing ? draft.id.trim() : hubIdFromName(draft.name, hubs.map((h) => h.id));
     setSaving(true);
     try {
-      const res = await fetch("/api/hubs", {
+      const res = await adminFetch("/api/hubs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, name: draft.name.trim(), catchment, address: draft.address.trim() || undefined }),
@@ -299,7 +300,7 @@ export function HubConfigPanel({
   const del = async (id: string) => {
     setMessage(null);
     try {
-      const res = await fetch("/api/hubs", {
+      const res = await adminFetch("/api/hubs", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),

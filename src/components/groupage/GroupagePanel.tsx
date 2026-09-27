@@ -21,6 +21,7 @@ import { SendQuoteButton } from "@/components/results/SendQuoteButton";
 import type { GroupagePallet, GroupageQuote, Hub, PalletFootprintClass } from "@/lib/groupage/groupage.types";
 import type { PackedItem, SessionHub, UnplacedItem } from "@/types/api";
 import type { StructuredDocument } from "@/lib/conversion/types";
+import { adminFetch } from "@/lib/security/admin-fetch";
 import {
   readPanelSnapshot,
   writePanelSnapshot,
@@ -209,7 +210,7 @@ export function GroupagePanel({
   const saveSessionHubToNetwork = async (h: SessionHub) => {
     setHubSaveState((s) => ({ ...s, [h.id]: { status: "saving" } }));
     try {
-      const res = await fetch("/api/hubs", {
+      const res = await adminFetch("/api/hubs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: h.id, name: h.name, catchment: h.catchment, ...(h.address ? { address: h.address } : {}) }),
@@ -247,7 +248,7 @@ export function GroupagePanel({
         }));
         return;
       }
-      const releaseRes = await fetch("/api/hubs", {
+      const releaseRes = await adminFetch("/api/hubs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

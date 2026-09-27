@@ -499,6 +499,10 @@ export interface AppConfig {
     /** Blank = no copy. Set to always BCC one address (e.g. the sender's own inbox) on every quote sent, so there's a paper trail without exposing that address to the client. */
     readonly bcc: string;
   };
+  readonly security: {
+    /** Shared secret for fleet/hub config writes (x-admin-key header). Blank = all admin writes refused. */
+    readonly adminApiKey: string;
+  };
   readonly observability: {
     readonly logLevel: LogLevel;
     readonly logPretty: boolean;
@@ -735,6 +739,9 @@ function buildConfig(raw: RawEnv): AppConfig {
       },
       timeoutMs: readInt(raw, "EMAIL_TIMEOUT_MS", 15_000, { min: 1 }),
       bcc: readString(raw, "EMAIL_BCC", ""),
+    },
+    security: {
+      adminApiKey: readString(raw, "ADMIN_API_KEY", ""),
     },
     observability: {
       logLevel: readLogLevel(raw, "LOG_LEVEL", "info"),

@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { FileHubRepository, HubConfigError } from "@/lib/groupage/hub.repository";
 import type { Hub } from "@/lib/groupage/groupage.types";
+import { requireAdmin } from "@/lib/security/admin-auth";
 
 export const runtime = "nodejs";
 
@@ -52,6 +53,8 @@ export async function GET(): Promise<Response> {
 }
 
 export async function POST(request: Request): Promise<Response> {
+  const denied = requireAdmin(request);
+  if (denied) return denied;
   try {
     const hub = parseHubBody(await request.json());
     await repo.upsertHub(hub);
@@ -68,6 +71,8 @@ export async function PUT(request: Request): Promise<Response> {
 }
 
 export async function DELETE(request: Request): Promise<Response> {
+  const denied = requireAdmin(request);
+  if (denied) return denied;
   try {
     const body = (await request.json()) as { id?: unknown };
     const id = typeof body?.id === "string" ? body.id.trim() : "";
