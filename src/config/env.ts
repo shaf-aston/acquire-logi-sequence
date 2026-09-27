@@ -726,13 +726,13 @@ function buildConfig(raw: RawEnv): AppConfig {
       maxEntries: readInt(raw, "QUOTE_HISTORY_MAX_ENTRIES", 20),
     },
     email: {
-      fromAddress: readString(raw, "EMAIL_FROM_ADDRESS", "beatsbyshaf@gmail.com"),
+      fromAddress: readString(raw, "EMAIL_FROM_ADDRESS", ""),
       fromName: readString(raw, "EMAIL_FROM_NAME", ""),
       smtp: {
         host: readString(raw, "EMAIL_SMTP_HOST", "smtp.gmail.com"),
         port: readInt(raw, "EMAIL_SMTP_PORT", 587, { min: 1, max: 65535 }),
         secure: readBool(raw, "EMAIL_SMTP_SECURE", false),
-        user: readString(raw, "EMAIL_SMTP_USER", "beatsbyshaf@gmail.com"),
+        user: readString(raw, "EMAIL_SMTP_USER", ""),
         // No default — a real send requires an explicit App Password; absence is
         // handled fail-loud by email.factory.ts, not silently defaulted here.
         pass: readString(raw, "EMAIL_SMTP_PASS", ""),

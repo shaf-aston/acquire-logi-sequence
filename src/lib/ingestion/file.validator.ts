@@ -11,7 +11,11 @@ export class FileValidationError extends Error {
   }
 }
 
-const PDF_MAGIC = "%PDF-";
+// Leading bytes each accepted type must start with. The MIME header is client-supplied, so a type
+// with no entry here is refused even if INGEST_ALLOWED_MIME lists it.
+const CONTENT_CHECKS: Readonly<Record<string, { magic: string; label: string }>> = {
+  "application/pdf": { magic: "%PDF-", label: "PDF" },
+};
 
 export interface ValidatedFile {
   readonly bytes: Uint8Array;
@@ -39,12 +43,13 @@ export function validateUpload(file: {
       `MIME type "${file.mimeType}" not allowed. Allowed: ${cfg.allowedMimeTypes.join(", ")}.`,
     );
   }
-  // Content sniff: a real PDF starts with %PDF-. Cheap defence against spoofed MIME.
-  if (file.mimeType === "application/pdf") {
-    const head = Buffer.from(file.bytes.subarray(0, PDF_MAGIC.length)).toString("latin1");
-    if (head !== PDF_MAGIC) {
-      throw new FileValidationError("File is not a valid PDF (missing %PDF- header).");
-    }
+  const check = CONTENT_CHECKS[file.mimeType];
+  if (check === undefined) {
+    throw new FileValidationError(`MIME type "${file.mimeType}" has no content check, so it can't be accepted.`);
+  }
+  const head = Buffer.from(file.bytes.subarray(0, check.magic.length)).toString("latin1");
+  if (head !== check.magic) {
+    throw new FileValidationError(`File is not a valid ${check.label} (missing ${check.magic} header).`);
   }
 
   return { bytes: file.bytes, mimeType: file.mimeType, filename: file.filename };

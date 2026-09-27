@@ -17,7 +17,8 @@ function escapeHtml(s: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function lineItemRows(items: readonly { label: string; amount: number }[]): string {
@@ -101,12 +102,12 @@ export function buildGroupageQuoteEmail(quote: GroupageQuote, companyName = ""):
     "Your Shared-Truck (Groupage) Quote",
     `<table style="width:100%;border-collapse:collapse;font-size:14px;">
       <tr><td colspan="2" style="padding:0 0 12px;"><strong>Route:</strong> ${escapeHtml(routeLine)}</td></tr>
-      <tr><td colspan="2" style="padding:0 0 12px;"><strong>Load:</strong> ${quote.demand.palletCount} pallets · ${quote.demand.footprints} pallet-spaces · ${quote.demand.weightKg} kg</td></tr>
+      <tr><td colspan="2" style="padding:0 0 12px;"><strong>Load:</strong> ${escapeHtml(String(quote.demand.palletCount))} pallets · ${escapeHtml(String(quote.demand.footprints))} pallet-spaces · ${escapeHtml(String(quote.demand.weightKg))} kg</td></tr>
       ${quote.eta ? `<tr><td colspan="2" style="padding:0 0 12px;"><strong>Committed delivery:</strong> ${escapeHtml(quote.eta)}</td></tr>` : ""}
       <tr><td colspan="2" style="padding:8px 0 4px;border-top:1px solid #eee;font-weight:600;">Breakdown</td></tr>
       ${lineItemRows(quote.lineItems)}
       <tr><td style="padding:12px 0 0;font-weight:700;font-size:16px;border-top:2px solid #333;">Total</td>
-          <td style="padding:12px 0 0;font-weight:700;font-size:16px;text-align:right;border-top:2px solid #333;">${quote.currencySymbol}${quote.total.toFixed(2)}</td></tr>
+          <td style="padding:12px 0 0;font-weight:700;font-size:16px;text-align:right;border-top:2px solid #333;">${escapeHtml(quote.currencySymbol)}${quote.total.toFixed(2)}</td></tr>
     </table>`,
     "This quote reflects the details submitted at the time of generation and may change if those details change.",
     companyName,
